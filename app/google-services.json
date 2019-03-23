@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "843023052116",
+    "firebase_url": "https://queue-hub.firebaseio.com",
+    "project_id": "queue-hub",
+    "storage_bucket": "queue-hub.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:843023052116:android:bbcc3f5b2bf0cb45",
+        "android_client_info": {
+          "package_name": "com.hsuproject.queuehub"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "843023052116-e9k159fk41kvua6koce62efltmp3qj9p.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDA8WezOKTgYnJQeaP6C1kPsvFM_gjAL44"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
