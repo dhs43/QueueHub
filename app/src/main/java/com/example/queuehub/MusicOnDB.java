@@ -56,8 +56,6 @@ class MusicOnDB {
                 filename = Objects.requireNonNull(dataSnapshot.getValue()).toString();
                 filename = filename.substring(1 ,filename.indexOf('='));
 
-                Log.d("Filename", filename);
-
                 try {
                     downloadFile = File.createTempFile(filename, ".mp3");
                 } catch (IOException e) {
@@ -76,8 +74,6 @@ class MusicOnDB {
                         Log.e("FileDownload", "File download failed: " + e.getMessage());
                     }
                 });
-
-                Log.d("DL FILE", downloadFile.getName());
             }
 
             @Override
