@@ -15,6 +15,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "843023052116-42ob4r201ou0ssnv4f9itn7js3kgqch8.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.hsuproject.queuehub",
+            "certificate_hash": "ed6e8d493cdb8c71853523c5889b4a065865f91a"
+          }
+        },
+        {
           "client_id": "843023052116-e9k159fk41kvua6koce62efltmp3qj9p.apps.googleusercontent.com",
           "client_type": 3
         }
@@ -29,8 +37,13 @@
           "status": 1
         },
         "appinvite_service": {
-          "status": 1,
-          "other_platform_oauth_client": []
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "843023052116-e9k159fk41kvua6koce62efltmp3qj9p.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         },
         "ads_service": {
           "status": 2
