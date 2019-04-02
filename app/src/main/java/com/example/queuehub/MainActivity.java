@@ -1,24 +1,45 @@
 package com.example.queuehub;
 
+import android.Manifest;
+import android.content.Intent;
+import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.ProgressBar;
+import android.widget.SeekBar;
+import android.widget.TextView;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
+import java.io.IOException;
 
-//okay
 
 public class MainActivity extends AppCompatActivity {
+
+    final private String TAG = "MainActivity";
+
+    // Storage permissions parameter
+    static int MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE;
+    Uri selectedFile;
 
     // Reference to FirebaseAuth object
     private FirebaseAuth mAuth;
@@ -27,13 +48,34 @@ public class MainActivity extends AppCompatActivity {
     // Reference to Firebase Storage
     private StorageReference mStorageRef;
 
-    // In the future we will get URI from a user-selected file
-    Uri file = Uri.parse("android.resource://com.hsuproject.queuehub/" + R.raw.harrison_ford);
+
+    MediaPlayer player;
+    Button btnPlay;
+    ImageView ivCover;
+    SeekBar seekBar;
+    TextView elapsedTime;
+    TextView remainingTime;
+    ProgressBar progressBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        btnPlay = findViewById(R.id.btnPlay);
+        elapsedTime = findViewById(R.id.elapsedTime);
+        remainingTime = findViewById(R.id.remainingTime);
+        seekBar = findViewById(R.id.seekBar);
+        //also need to set cover art
+        ivCover = findViewById(R.id.ivCover);
+        progressBar = findViewById(R.id.loading_spinner);
+
+        Button btnSelectFile = findViewById(R.id.btnSelectFile);
+
+        // Request access to local files
+        requestPermissions(
+                new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
+                MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE);
 
         // Initializing reference to FirebaseAuth object
         mAuth = FirebaseAuth.getInstance();
@@ -44,26 +86,111 @@ public class MainActivity extends AppCompatActivity {
         // Register user anonymously with Firebase
         authenticateAnonymously();
 
-        // Initialize class for music upload/download
-        MusicOnDB musicOnDB = new MusicOnDB();
-        musicOnDB.uploadMusicFile(mStorageRef, mDatabaseRef, file);  // file is the input URI.
-        musicOnDB.downloadMusicFile(mStorageRef, mDatabaseRef);
+        btnSelectFile.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent_upload = new Intent();
+                intent_upload.setType("audio/*");
+                intent_upload.setAction(Intent.ACTION_GET_CONTENT);
+                startActivityForResult(intent_upload, 1);
+            }
+        });
+
+        final DatabaseReference queueRef = mDatabaseRef.getReference("queue");
+        Query lastQuery = queueRef.orderByValue().limitToLast(1);
+        lastQuery.addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+                MusicOnDB musicOnDB = new MusicOnDB();
+                String filename = (dataSnapshot.getKey());
+                musicOnDB.getFileUrl(filename, mStorageRef, new MusicOnDB.DatabaseCallback() {
+                    @Override
+                    public void onCallback(String fileURL) {
+                        player = new MediaPlayer();
+                        player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                            @Override
+                            public void onCompletion(MediaPlayer mp) {
+                                btnPlay.setBackgroundResource(R.drawable.play);
+                            }
+                        });
+                        try {
+                            player.setDataSource(fileURL);
+                            player.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+                                @Override
+                                public void onPrepared(MediaPlayer mp) {
+                                    player.start();
+                                    btnPlay.setBackgroundResource(R.drawable.stop);
+                                    btnPlay.setOnClickListener(new View.OnClickListener() {
+                                        @Override
+                                        public void onClick(View v) {
+                                            if (!player.isPlaying()) {
+                                                //stopping
+                                                player.start();
+                                                btnPlay.setBackgroundResource(R.drawable.stop);
+                                            } else {
+                                                //playing
+                                                player.pause();
+                                                btnPlay.setBackgroundResource(R.drawable.play);
+                                            }
+                                        }
+                                    });
+                                }
+                            });
+                            player.prepare();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                });
+            }
+
+            @Override
+            public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+            }
+
+            @Override
+            public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
+            }
+
+            @Override
+            public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                Log.e(TAG, databaseError.getMessage());
+            }
+        });
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        // Result of the music file selection
+        if (requestCode == 1) {
+            if (resultCode == RESULT_OK) {
+                if (data != null) {
+                    selectedFile = data.getData();
 
+                    MusicOnDB musicOnDB = new MusicOnDB();
+                    musicOnDB.uploadMusicFile(selectedFile, mStorageRef, mDatabaseRef, progressBar);
+                }
+            }
+        }
+        super.onActivityResult(requestCode, resultCode, data);
+    }
 
     // Authenticate with Firebase anonymously to allow users
     // to read/write from database without creating an account
-    public void authenticateAnonymously(){
+    public void authenticateAnonymously() {
         mAuth.signInAnonymously()
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
-                            Log.d("SignIn", "Signed in successfully");
+                            Log.d(TAG, "Signed in successfully");
                             FirebaseUser user = mAuth.getCurrentUser();
                         } else {
-                            Log.e("SignIn", "Sign in failed");
+                            Log.e(TAG, "Sign in failed");
                         }
                     }
                 });

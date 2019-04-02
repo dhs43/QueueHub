@@ -1,5 +1,5 @@
 <resources>
     <string name="app_name">QueueHub</string>
-    <string name="search">Search</string>
-    <string name="testsearch">TestSearch</string>
+    <string name="select_file">Select File</string>
+    <string name="album_art">Album Art</string>
 </resources>
