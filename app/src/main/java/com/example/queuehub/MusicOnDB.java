@@ -27,7 +27,7 @@ class MusicOnDB {
         String[] segments = Objects.requireNonNull(file.getPath()).split("/");
         final String idStr = segments[segments.length - 1];
 
-        // Upload file with id as name
+        // Upload file with id as name.
         final String filename;
         if (idStr.contains(".")){
             filename = idStr.substring(0, idStr.indexOf("."));
