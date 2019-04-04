@@ -27,9 +27,15 @@ class MusicOnDB {
         String[] segments = Objects.requireNonNull(file.getPath()).split("/");
         final String idStr = segments[segments.length - 1];
 
-        // Upload file with id as name
+        // Upload file with id as name.
+        final String filename;
+        if (idStr.contains(".")){
+            filename = idStr.substring(0, idStr.indexOf("."));
+        }else{
+            filename = idStr;
+        }
         StorageReference musicRef;
-        musicRef = storageRef.child("music/" + idStr);
+        musicRef = storageRef.child("music/" + filename);
 
         musicRef.putFile(file)
                 .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
@@ -38,10 +44,10 @@ class MusicOnDB {
                         DatabaseReference queueRef = databaseRef.getReference("queue");
 
                         if (idStr != null) {
-                            Log.d(TAG, idStr);
-                            queueRef.child(idStr).setValue("0");
+                            Log.d(TAG, filename);
+                            queueRef.child(filename).setValue("0");
                             Calendar calendar = Calendar.getInstance();
-                            queueRef.child(idStr).setValue(calendar.getTimeInMillis());
+                            queueRef.child(filename).setValue(calendar.getTimeInMillis());
                             progressBar.setVisibility(View.GONE);
 
                             Log.d(TAG, "File uploaded");
