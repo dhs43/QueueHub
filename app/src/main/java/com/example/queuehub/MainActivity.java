@@ -3,6 +3,7 @@ package com.example.queuehub;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
@@ -90,6 +91,8 @@ public class MainActivity extends AppCompatActivity {
         // Register user anonymously with Firebase
         authenticateAnonymously();
 
+        player = new MediaPlayer();
+
         btnSelectFile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -110,6 +113,8 @@ public class MainActivity extends AppCompatActivity {
                 musicOnDB.getFileUrl(filename, mStorageRef, new MusicOnDB.DatabaseCallback() {
                     @Override
                     public void onCallback(String fileURL) {
+                        // Release memory from previously-playing player
+                        player.release();
                         player = new MediaPlayer();
                         player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
                             @Override
@@ -163,13 +168,14 @@ public class MainActivity extends AppCompatActivity {
                                     }).start();
                                     //end seek bar addition
                                     //player.start();
-                                    btnPlay.setBackgroundResource(R.drawable.stop);
+                                    seekBar.setBackgroundColor(Color.LTGRAY); // Temporary to show when player is ready
                                     btnPlay.setOnClickListener(new View.OnClickListener() {
                                         @Override
                                         public void onClick(View v) {
                                             if (!player.isPlaying()) {
                                                 //stopping
                                                 player.start();
+                                                seekBar.setBackgroundColor(Color.TRANSPARENT);
                                                 btnPlay.setBackgroundResource(R.drawable.stop);
                                             } else {
                                                 //playing
