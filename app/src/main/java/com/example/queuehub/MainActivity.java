@@ -20,7 +20,6 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.SeekBar;
 import android.widget.TextView;
-import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
@@ -32,6 +31,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
@@ -56,10 +56,11 @@ public class MainActivity extends AppCompatActivity {
     private StorageReference mStorageRef;
 
 
-    //needed for queue display
-    private List<Song> songs;
-    private SongAdapter adapter;
-    RecyclerView songList;
+
+    //for the queue
+    SongAdapter adapter;
+    RecyclerView rvSongs;
+
     MediaPlayer player;
     Button btnPlay;
     SeekBar seekBar;
@@ -78,7 +79,14 @@ public class MainActivity extends AppCompatActivity {
         remainingTime = findViewById(R.id.remainingTime);
         seekBar = findViewById(R.id.seekBar);
         progressBar = findViewById(R.id.loading_spinner);
-        songList = findViewById(R.id.rvSongs);
+
+        //for the queue
+        List<Song> songs = new ArrayList<>();
+        rvSongs = findViewById(R.id.rvSongs);
+        adapter = new SongAdapter(this, songs);
+        rvSongs.setLayoutManager(new LinearLayoutManager(this));
+        rvSongs.setAdapter(adapter);
+
 
         Button btnSelectFile = findViewById(R.id.btnSelectFile);
 
@@ -114,6 +122,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
                 MusicOnDB musicOnDB = new MusicOnDB();
+
                 String filename = (dataSnapshot.getKey());
                 musicOnDB.getFileUrl(filename, mStorageRef, new MusicOnDB.DatabaseCallback() {
                     @Override
@@ -217,28 +226,31 @@ public class MainActivity extends AppCompatActivity {
         });
 
         //adding in queue here
-        songList = findViewById(R.id.rvSongs);
-        songs = new ArrayList<>();
-        adapter = new SongAdapter(this, songs);
-        songList.setLayoutManager(new LinearLayoutManager(this));
-        songList.setAdapter(adapter);
 
+        MusicOnDB musicOnDB = new MusicOnDB();
+        final List<Song> songList = new ArrayList<>();
+        musicOnDB.getSongs(mDatabaseRef, new MusicOnDB.songNamesCallback() {
+            @Override
+            public void onCallback(List<String> songNames) {
+                for(String name : songNames){
+                    songList.add(new Song(name, "Unknown"));
+                }
+                populateQueue(songList);
+            }
+        });
 
-        //populateQueue();
+        //populateQueue(songList);
     }
 
-    private void populateQueue(List<Song> songs) {
-       // List<Song> songsToAdd = songs;
 
-        for (int i = 0; i < songs.size(); i++) {
-            //below would have the firebase array stuff
-            Song title = songs.get(i);
-            Song temp = new Song(title, "Unknown");
-            songs.add(temp);
+    private void populateQueue( List<Song> songs) {
+        List<Song> toAdd = new ArrayList<>();
+        for(int i = 0; i < songs.size(); i++){
+            toAdd.add(songs.get(i));
         }
 
         adapter.clear();
-        adapter.addSongs(songs);
+        adapter.addSongs(toAdd);
     }
 
     //seek bar helper functions
