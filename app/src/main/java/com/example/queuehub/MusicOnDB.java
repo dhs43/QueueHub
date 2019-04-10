@@ -23,12 +23,19 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
+
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.ListIterator;
 import java.util.Objects;
 
 class MusicOnDB {
@@ -107,6 +114,8 @@ class MusicOnDB {
                         Log.e(TAG, e.getMessage());
                     }
                 });
+
+        //update the recycler view too
     }
 
 

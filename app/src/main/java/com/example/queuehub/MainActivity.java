@@ -23,7 +23,6 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.SeekBar;
 import android.widget.TextView;
-
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
@@ -35,10 +34,13 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -60,9 +62,13 @@ public class MainActivity extends AppCompatActivity {
     private StorageReference mStorageRef;
 
 
+
+    //for the queue
+    SongAdapter adapter;
+    RecyclerView rvSongs;
+
     MediaPlayer player;
     Button btnPlay;
-    ImageView ivCover;
     SeekBar seekBar;
     TextView elapsedTime;
     TextView remainingTime;
@@ -83,13 +89,12 @@ public class MainActivity extends AppCompatActivity {
         elapsedTime = findViewById(R.id.elapsedTime);
         remainingTime = findViewById(R.id.remainingTime);
         seekBar = findViewById(R.id.seekBar);
-        //also need to set cover art
-        ivCover = findViewById(R.id.ivCover);
         progressBar = findViewById(R.id.loading_spinner);
 
         //for the queue
         List<Song> songs = new ArrayList<>();
         rvSongs = findViewById(R.id.rvSongs);
+
         songsAdapter = new SongAdapter(this, songs);
         rvSongs.setLayoutManager(new LinearLayoutManager(this));
         rvSongs.setAdapter(songsAdapter);
@@ -137,10 +142,12 @@ public class MainActivity extends AppCompatActivity {
 
         final DatabaseReference queueRef = mDatabaseRef.getReference("queue");
         Query lastQuery = queueRef.orderByValue().limitToLast(1);
+
         lastQuery.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
                 MusicOnDB musicOnDB = new MusicOnDB();
+
                 String filename = (dataSnapshot.getKey());
                 musicOnDB.getFileUrl(filename, mStorageRef, new MusicOnDB.DatabaseCallback() {
                     @Override
@@ -201,8 +208,10 @@ public class MainActivity extends AppCompatActivity {
                                     }).start();
                                     //end seek bar addition
                                     //player.start();
+
                                     seekBar.setBackgroundColor(Color.LTGRAY); // Temporary to show when player is ready
-                                    btnPlay.setBackgroundResource(R.drawable.stop);
+                                    btnPlay.setBackgroundResource(R.drawable.play);
+                                  
                                     btnPlay.setOnClickListener(new View.OnClickListener() {
                                         @Override
                                         public void onClick(View v) {
@@ -228,6 +237,8 @@ public class MainActivity extends AppCompatActivity {
                 });
             }
 
+
+
             @Override
             public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
             }
@@ -245,6 +256,33 @@ public class MainActivity extends AppCompatActivity {
                 Log.e(TAG, databaseError.getMessage());
             }
         });
+
+        //adding in queue here
+
+        MusicOnDB musicOnDB = new MusicOnDB();
+        final List<Song> songList = new ArrayList<>();
+        musicOnDB.getSongs(mDatabaseRef, new MusicOnDB.songNamesCallback() {
+            @Override
+            public void onCallback(List<String> songNames) {
+                for(String name : songNames){
+                    songList.add(new Song(name, "Unknown"));
+                }
+                populateQueue(songList);
+            }
+        });
+
+        //populateQueue(songList);
+    }
+
+
+    private void populateQueue( List<Song> songs) {
+        List<Song> toAdd = new ArrayList<>();
+        for(int i = 0; i < songs.size(); i++){
+            toAdd.add(songs.get(i));
+        }
+
+        adapter.clear();
+        adapter.addSongs(toAdd);
     }
 
     //seek bar helper functions
