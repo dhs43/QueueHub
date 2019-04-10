@@ -16,10 +16,11 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.SeekBar;
 import android.widget.TextView;
-
+import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
@@ -59,7 +60,6 @@ public class MainActivity extends AppCompatActivity {
     private List<Song> songs;
     private SongAdapter adapter;
     RecyclerView songList;
-
     MediaPlayer player;
     Button btnPlay;
     SeekBar seekBar;
