@@ -4,6 +4,7 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.graphics.Color;
+
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
@@ -14,6 +15,7 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -37,6 +39,7 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
 import java.io.IOException;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -69,6 +72,7 @@ public class MainActivity extends AppCompatActivity {
     //for the queue
     SongAdapter songsAdapter;
     RecyclerView rvSongs;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -118,7 +122,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-
         //adding in queue here
         MusicOnDB musicOnDB = new MusicOnDB();
         final List<Song> songList = new ArrayList<>();
@@ -144,6 +147,7 @@ public class MainActivity extends AppCompatActivity {
                     public void onCallback(String fileURL) {
                         // Release memory from previously-playing player
                         player.release();
+
                         player = new MediaPlayer();
                         player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
                             @Override
@@ -198,6 +202,7 @@ public class MainActivity extends AppCompatActivity {
                                     //end seek bar addition
                                     //player.start();
                                     seekBar.setBackgroundColor(Color.LTGRAY); // Temporary to show when player is ready
+                                    btnPlay.setBackgroundResource(R.drawable.stop);
                                     btnPlay.setOnClickListener(new View.OnClickListener() {
                                         @Override
                                         public void onClick(View v) {
@@ -303,7 +308,6 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
     }
-
     private void populateQueue( List<Song> songs) {
         List<Song> toAdd = new ArrayList<>();
         for(int i = 0; i < songs.size(); i++){

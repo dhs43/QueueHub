@@ -1,5 +1,7 @@
 package com.example.queuehub;
 
+import android.graphics.BitmapFactory;
+import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.util.Log;
@@ -20,6 +22,13 @@ import com.google.firebase.storage.UploadTask;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
+
+import java.util.Calendar;
 import java.util.Objects;
 
 class MusicOnDB {
@@ -49,6 +58,33 @@ class MusicOnDB {
         StorageReference musicRef;
         musicRef = storageRef.child("music/" + filename);
         musicRef.putFile(file, metadata)
+
+        //retrieves image form uri source and returns in art
+        MediaMetadataRetriever retriever = new MediaMetadataRetriever();
+        retriever.setDataSource(filename);
+        byte[] art = retriever.getEmbeddedPicture();
+
+//========================================================================================
+//  For when we pull 'art' from server how to assign to imageview                              =
+//---------------------------------------------------------------------------------------=
+//        if( art != null ){
+//            imgAlbum.setImageBitmap( BitmapFactory.decodeByteArray(art, 0, art.length));
+//        }
+//        else{
+//            imgAlbum.setImageResource(R.drawable.no_image);
+//        }
+//========================================================================================
+
+        //pretty self explaining
+        MediaMetadataRetriever mmr = new MediaMetadataRetriever();
+        mmr.setDataSource(filename);  //mmr.setDataSource(this, filename); <-- needed?
+        String songTitle = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE);
+        String songArtist = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST);
+
+        StorageReference musicRef;
+        musicRef = storageRef.child("music/" + filename);
+
+        musicRef.putFile(file)
                 .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                     @Override
                     public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
@@ -94,7 +130,6 @@ class MusicOnDB {
     public interface DatabaseCallback {
         void onCallback(String thisURL);
     }
-
 
     //to get the names of the songs in the queue
     public void getSongs(FirebaseDatabase database, final songNamesCallback songsCallback){
