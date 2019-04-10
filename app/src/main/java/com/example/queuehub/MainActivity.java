@@ -11,10 +11,11 @@ import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.SeekBar;
 import android.widget.TextView;
@@ -34,6 +35,8 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -52,9 +55,13 @@ public class MainActivity extends AppCompatActivity {
     private StorageReference mStorageRef;
 
 
+    //needed for queue display
+    private List<Song> songs;
+    private SongAdapter adapter;
+    RecyclerView songList;
+
     MediaPlayer player;
     Button btnPlay;
-    ImageView ivCover;
     SeekBar seekBar;
     TextView elapsedTime;
     TextView remainingTime;
@@ -70,9 +77,8 @@ public class MainActivity extends AppCompatActivity {
         elapsedTime = findViewById(R.id.elapsedTime);
         remainingTime = findViewById(R.id.remainingTime);
         seekBar = findViewById(R.id.seekBar);
-        //also need to set cover art
-        ivCover = findViewById(R.id.ivCover);
         progressBar = findViewById(R.id.loading_spinner);
+        songList = findViewById(R.id.rvSongs);
 
         Button btnSelectFile = findViewById(R.id.btnSelectFile);
 
@@ -90,6 +96,7 @@ public class MainActivity extends AppCompatActivity {
         // Register user anonymously with Firebase
         authenticateAnonymously();
 
+
         btnSelectFile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -102,6 +109,7 @@ public class MainActivity extends AppCompatActivity {
 
         final DatabaseReference queueRef = mDatabaseRef.getReference("queue");
         Query lastQuery = queueRef.orderByValue().limitToLast(1);
+
         lastQuery.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
@@ -163,7 +171,7 @@ public class MainActivity extends AppCompatActivity {
                                     }).start();
                                     //end seek bar addition
                                     //player.start();
-                                    btnPlay.setBackgroundResource(R.drawable.stop);
+                                    btnPlay.setBackgroundResource(R.drawable.play);
                                     btnPlay.setOnClickListener(new View.OnClickListener() {
                                         @Override
                                         public void onClick(View v) {
@@ -188,6 +196,8 @@ public class MainActivity extends AppCompatActivity {
                 });
             }
 
+
+
             @Override
             public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
             }
@@ -205,6 +215,30 @@ public class MainActivity extends AppCompatActivity {
                 Log.e(TAG, databaseError.getMessage());
             }
         });
+
+        //adding in queue here
+        songList = findViewById(R.id.rvSongs);
+        songs = new ArrayList<>();
+        adapter = new SongAdapter(this, songs);
+        songList.setLayoutManager(new LinearLayoutManager(this));
+        songList.setAdapter(adapter);
+
+
+        //populateQueue();
+    }
+
+    private void populateQueue(List<Song> songs) {
+       // List<Song> songsToAdd = songs;
+
+        for (int i = 0; i < songs.size(); i++) {
+            //below would have the firebase array stuff
+            Song title = songs.get(i);
+            Song temp = new Song(title, "Unknown");
+            songs.add(temp);
+        }
+
+        adapter.clear();
+        adapter.addSongs(songs);
     }
 
     //seek bar helper functions
