@@ -12,6 +12,8 @@ import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -35,6 +37,8 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -62,6 +66,10 @@ public class MainActivity extends AppCompatActivity {
     ProgressBar progressBar;
     int totalTime;
 
+    //for the queue
+    SongAdapter songsAdapter;
+    RecyclerView rvSongs;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -74,6 +82,13 @@ public class MainActivity extends AppCompatActivity {
         //also need to set cover art
         ivCover = findViewById(R.id.ivCover);
         progressBar = findViewById(R.id.loading_spinner);
+
+        //for the queue
+        List<Song> songs = new ArrayList<>();
+        rvSongs = findViewById(R.id.rvSongs);
+        songsAdapter = new SongAdapter(this, songs);
+        rvSongs.setLayoutManager(new LinearLayoutManager(this));
+        rvSongs.setAdapter(songsAdapter);
 
         Button btnSelectFile = findViewById(R.id.btnSelectFile);
 
@@ -100,6 +115,20 @@ public class MainActivity extends AppCompatActivity {
                 intent_upload.setType("audio/*");
                 intent_upload.setAction(Intent.ACTION_GET_CONTENT);
                 startActivityForResult(intent_upload, 1);
+            }
+        });
+
+
+        //adding in queue here
+        MusicOnDB musicOnDB = new MusicOnDB();
+        final List<Song> songList = new ArrayList<>();
+        musicOnDB.getSongs(mDatabaseRef, new MusicOnDB.songNamesCallback() {
+            @Override
+            public void onCallback(List<String> songNames) {
+                for(String name : songNames){
+                    songList.add(new Song(name, "Unknown"));
+                }
+                populateQueue(songList);
             }
         });
 
@@ -273,5 +302,15 @@ public class MainActivity extends AppCompatActivity {
                         }
                     }
                 });
+    }
+
+    private void populateQueue( List<Song> songs) {
+        List<Song> toAdd = new ArrayList<>();
+        for(int i = 0; i < songs.size(); i++){
+            toAdd.add(songs.get(i));
+        }
+
+        songsAdapter.clear();
+        songsAdapter.addSongs(toAdd);
     }
 }
