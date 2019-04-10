@@ -10,6 +10,7 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.storage.StorageMetadata;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
@@ -34,10 +35,15 @@ class MusicOnDB {
         }else{
             filename = idStr;
         }
+
+        StorageMetadata metadata = new StorageMetadata.Builder()
+                .setContentType("audio")
+                .setCustomMetadata("name", "test")
+                .build();
+
         StorageReference musicRef;
         musicRef = storageRef.child("music/" + filename);
-
-        musicRef.putFile(file)
+        musicRef.putFile(file, metadata)
                 .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                     @Override
                     public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
