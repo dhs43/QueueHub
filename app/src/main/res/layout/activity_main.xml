@@ -6,14 +6,13 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-
     <ImageView
         android:id="@+id/ivCover"
-        android:layout_width="304dp"
-        android:layout_height="294dp"
+        android:layout_width="213dp"
+        android:layout_height="210dp"
         android:layout_marginTop="28dp"
         android:layout_marginEnd="8dp"
-        android:layout_marginRight="8dp"
+        android:contentDescription="@string/album_art"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -33,12 +32,9 @@
         android:layout_width="66dp"
         android:layout_height="41dp"
         android:layout_marginStart="8dp"
-        android:layout_marginLeft="8dp"
-        android:layout_marginTop="52dp"
+        android:layout_marginTop="4dp"
         android:layout_marginEnd="8dp"
-        android:layout_marginRight="8dp"
         android:background="@drawable/play"
-        android:onClick="play"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
@@ -57,15 +53,54 @@
             android:id="@+id/elapsedTime"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="40dp"
+            android:layout_marginStart="40dp"
             android:text="0:01" />
 
         <TextView
             android:id="@+id/remainingTime"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="280dp"
+            android:layout_marginStart="280dp"
             android:text="-2:29" />
     </LinearLayout>
+
+    <Button
+        android:id="@+id/btnSelectFile"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="160dp"
+        android:layout_marginBottom="8dp"
+        android:background="@color/colorPrimaryDark"
+        android:text="@string/select_file"
+        android:textAllCaps="false"
+        android:textColor="#FFF"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/rvSongs" />
+
+    <ProgressBar
+        android:id="@+id/loading_spinner"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:indeterminateTint="@color/colorPrimary"
+        android:indeterminateTintMode="src_atop"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/btnSelectFile" />
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/rvSongs"
+        android:layout_width="388dp"
+        android:layout_height="184dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="8dp"
+        android:background="@color/offwhite"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.428"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btnPlay" />
 
 </android.support.constraint.ConstraintLayout>
