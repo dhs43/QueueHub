@@ -62,9 +62,6 @@ class MusicOnDB {
                 .setCustomMetadata("name", "test")
                 .build();
 
-        StorageReference musicRef;
-        musicRef = storageRef.child("music/" + filename);
-        musicRef.putFile(file, metadata)
 
         //retrieves image form uri source and returns in art
         MediaMetadataRetriever retriever = new MediaMetadataRetriever();
