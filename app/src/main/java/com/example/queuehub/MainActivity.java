@@ -3,6 +3,8 @@ package com.example.queuehub;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.graphics.Color;
+
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
@@ -13,6 +15,7 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -36,6 +39,9 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -69,6 +75,11 @@ public class MainActivity extends AppCompatActivity {
     ProgressBar progressBar;
     int totalTime;
 
+    //for the queue
+    SongAdapter songsAdapter;
+    RecyclerView rvSongs;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -83,10 +94,10 @@ public class MainActivity extends AppCompatActivity {
         //for the queue
         List<Song> songs = new ArrayList<>();
         rvSongs = findViewById(R.id.rvSongs);
-        adapter = new SongAdapter(this, songs);
-        rvSongs.setLayoutManager(new LinearLayoutManager(this));
-        rvSongs.setAdapter(adapter);
 
+        songsAdapter = new SongAdapter(this, songs);
+        rvSongs.setLayoutManager(new LinearLayoutManager(this));
+        rvSongs.setAdapter(songsAdapter);
 
         Button btnSelectFile = findViewById(R.id.btnSelectFile);
 
@@ -104,6 +115,7 @@ public class MainActivity extends AppCompatActivity {
         // Register user anonymously with Firebase
         authenticateAnonymously();
 
+        player = new MediaPlayer();
 
         btnSelectFile.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -112,6 +124,19 @@ public class MainActivity extends AppCompatActivity {
                 intent_upload.setType("audio/*");
                 intent_upload.setAction(Intent.ACTION_GET_CONTENT);
                 startActivityForResult(intent_upload, 1);
+            }
+        });
+
+        //adding in queue here
+        MusicOnDB musicOnDB = new MusicOnDB();
+        final List<Song> songList = new ArrayList<>();
+        musicOnDB.getSongs(mDatabaseRef, new MusicOnDB.songNamesCallback() {
+            @Override
+            public void onCallback(List<String> songNames) {
+                for(String name : songNames){
+                    songList.add(new Song(name, "Unknown"));
+                }
+                populateQueue(songList);
             }
         });
 
@@ -127,6 +152,9 @@ public class MainActivity extends AppCompatActivity {
                 musicOnDB.getFileUrl(filename, mStorageRef, new MusicOnDB.DatabaseCallback() {
                     @Override
                     public void onCallback(String fileURL) {
+                        // Release memory from previously-playing player
+                        player.release();
+
                         player = new MediaPlayer();
                         player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
                             @Override
@@ -180,13 +208,17 @@ public class MainActivity extends AppCompatActivity {
                                     }).start();
                                     //end seek bar addition
                                     //player.start();
+
+                                    seekBar.setBackgroundColor(Color.LTGRAY); // Temporary to show when player is ready
                                     btnPlay.setBackgroundResource(R.drawable.play);
+                                  
                                     btnPlay.setOnClickListener(new View.OnClickListener() {
                                         @Override
                                         public void onClick(View v) {
                                             if (!player.isPlaying()) {
                                                 //stopping
                                                 player.start();
+                                                seekBar.setBackgroundColor(Color.TRANSPARENT);
                                                 btnPlay.setBackgroundResource(R.drawable.stop);
                                             } else {
                                                 //playing
@@ -313,5 +345,14 @@ public class MainActivity extends AppCompatActivity {
                         }
                     }
                 });
+    }
+    private void populateQueue( List<Song> songs) {
+        List<Song> toAdd = new ArrayList<>();
+        for(int i = 0; i < songs.size(); i++){
+            toAdd.add(songs.get(i));
+        }
+
+        songsAdapter.clear();
+        songsAdapter.addSongs(toAdd);
     }
 }
