@@ -64,7 +64,6 @@ public class MainActivity extends AppCompatActivity {
 
 
     //for the queue
-    SongAdapter adapter;
     RecyclerView rvSongs;
 
     MediaPlayer player;
@@ -77,7 +76,6 @@ public class MainActivity extends AppCompatActivity {
 
     //for the queue
     SongAdapter songsAdapter;
-    RecyclerView rvSongs;
 
 
     @Override
@@ -127,18 +125,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        //adding in queue here
-        MusicOnDB musicOnDB = new MusicOnDB();
-        final List<Song> songList = new ArrayList<>();
-        musicOnDB.getSongs(mDatabaseRef, new MusicOnDB.songNamesCallback() {
-            @Override
-            public void onCallback(List<String> songNames) {
-                for(String name : songNames){
-                    songList.add(new Song(name, "Unknown"));
-                }
-                populateQueue(songList);
-            }
-        });
 
         final DatabaseReference queueRef = mDatabaseRef.getReference("queue");
         Query lastQuery = queueRef.orderByValue().limitToLast(1);
@@ -270,8 +256,6 @@ public class MainActivity extends AppCompatActivity {
                 populateQueue(songList);
             }
         });
-
-        //populateQueue(songList);
     }
 
 
@@ -281,8 +265,8 @@ public class MainActivity extends AppCompatActivity {
             toAdd.add(songs.get(i));
         }
 
-        adapter.clear();
-        adapter.addSongs(toAdd);
+        songsAdapter.clear();
+        songsAdapter.addSongs(toAdd);
     }
 
     //seek bar helper functions
@@ -345,14 +329,5 @@ public class MainActivity extends AppCompatActivity {
                         }
                     }
                 });
-    }
-    private void populateQueue( List<Song> songs) {
-        List<Song> toAdd = new ArrayList<>();
-        for(int i = 0; i < songs.size(); i++){
-            toAdd.add(songs.get(i));
-        }
-
-        songsAdapter.clear();
-        songsAdapter.addSongs(toAdd);
     }
 }

@@ -64,7 +64,7 @@ class MusicOnDB {
 
         StorageReference musicRef;
         musicRef = storageRef.child("music/" + filename);
-        musicRef.putFile(file, metadata)
+        musicRef.putFile(file, metadata);
 
         //retrieves image form uri source and returns in art
         MediaMetadataRetriever retriever = new MediaMetadataRetriever();
@@ -88,7 +88,6 @@ class MusicOnDB {
         String songTitle = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE);
         String songArtist = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST);
 
-        StorageReference musicRef;
         musicRef = storageRef.child("music/" + filename);
 
         musicRef.putFile(file)
