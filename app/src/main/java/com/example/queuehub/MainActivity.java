@@ -66,12 +66,12 @@ public class MainActivity extends AppCompatActivity {
     //for the queue
     RecyclerView rvSongs;
 
-    MediaPlayer player;
-    Button btnPlay;
-    SeekBar seekBar;
-    TextView elapsedTime;
-    TextView remainingTime;
-    ProgressBar progressBar;
+    static MediaPlayer player;
+    static Button btnPlay;
+    static SeekBar seekBar;
+    static TextView elapsedTime;
+    static TextView remainingTime;
+    static ProgressBar progressBar;
     int totalTime;
 
     //for the queue
@@ -90,7 +90,7 @@ public class MainActivity extends AppCompatActivity {
         progressBar = findViewById(R.id.loading_spinner);
 
         //for the queue
-        List<Song> songs = new ArrayList<>();
+         List<Song> songs = new ArrayList<>();
         rvSongs = findViewById(R.id.rvSongs);
 
         songsAdapter = new SongAdapter(this, songs);
@@ -219,6 +219,17 @@ public class MainActivity extends AppCompatActivity {
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
+                    }
+                });
+
+                final List<Song> songList = new ArrayList<>();
+                musicOnDB.getSongs(mDatabaseRef, new MusicOnDB.songNamesCallback() {
+                    @Override
+                    public void onCallback(List<String> songNames) {
+                        for(String name : songNames){
+                            songList.add(new Song(name, "Unknown"));
+                        }
+                        populateQueue(songList);
                     }
                 });
             }

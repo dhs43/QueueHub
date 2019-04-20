@@ -15,6 +15,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageMetadata;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -56,38 +57,7 @@ class MusicOnDB {
         }else{
             filename = idStr;
         }
-
-        StorageMetadata metadata = new StorageMetadata.Builder()
-                .setContentType("audio")
-                .setCustomMetadata("name", "test")
-                .build();
-
         StorageReference musicRef;
-        musicRef = storageRef.child("music/" + filename);
-        musicRef.putFile(file, metadata);
-
-        //retrieves image form uri source and returns in art
-        MediaMetadataRetriever retriever = new MediaMetadataRetriever();
-        retriever.setDataSource(filename);
-        byte[] art = retriever.getEmbeddedPicture();
-
-//========================================================================================
-//  For when we pull 'art' from server how to assign to imageview                              =
-//---------------------------------------------------------------------------------------=
-//        if( art != null ){
-//            imgAlbum.setImageBitmap( BitmapFactory.decodeByteArray(art, 0, art.length));
-//        }
-//        else{
-//            imgAlbum.setImageResource(R.drawable.no_image);
-//        }
-//========================================================================================
-
-        //pretty self explaining
-        MediaMetadataRetriever mmr = new MediaMetadataRetriever();
-        mmr.setDataSource(filename);  //mmr.setDataSource(this, filename); <-- needed?
-        String songTitle = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE);
-        String songArtist = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST);
-
         musicRef = storageRef.child("music/" + filename);
 
         musicRef.putFile(file)
@@ -113,10 +83,7 @@ class MusicOnDB {
                         Log.e(TAG, e.getMessage());
                     }
                 });
-
-        //update the recycler view too
     }
-
 
     void getFileUrl(String filename, StorageReference storageRef, final DatabaseCallback databaseCallback) {
 
