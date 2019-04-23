@@ -1,14 +1,10 @@
 package com.example.queuehub;
 
 import android.Manifest;
-import android.annotation.SuppressLint;
 import android.content.Intent;
-import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
@@ -27,16 +23,10 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.ChildEventListener;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -60,7 +50,7 @@ public class MainActivity extends AppCompatActivity {
     MediaPlayer player;
     Button btnPlay;
     ImageView ivCover;
-    SeekBar mySeekBar;
+    SeekBar seekBar;
     TextView elapsedTime;
     TextView remainingTime;
     ProgressBar progressBar;
@@ -77,8 +67,7 @@ public class MainActivity extends AppCompatActivity {
 
         //also need to set cover art
         ivCover = findViewById(R.id.ivCover);
-
-        mySeekBar = findViewById(R.id.seekBar);
+        seekBar = findViewById(R.id.seekBar);
         btnPlay = findViewById(R.id.btnPlay);
         elapsedTime = findViewById(R.id.elapsedTime);
         remainingTime = findViewById(R.id.remainingTime);
@@ -117,11 +106,11 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        // Instantiate a MusicPlayer
+        MusicPlayer mMusicPlayer = new MusicPlayer(seekBar, btnPlay, remainingTime, elapsedTime, songsAdapter);
 
-        MusicPlayer mMusicPlayer = new MusicPlayer(mySeekBar);
-        mMusicPlayer.playFile(mStorageRef,mDatabaseRef, btnPlay, mySeekBar);
-
-
+        // This line can be moved to wherever we need to play the song.
+        mMusicPlayer.playFile(mStorageRef,mDatabaseRef);
     }
 
     @Override
@@ -156,6 +145,4 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
     }
-
-
 }

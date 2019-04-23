@@ -19,31 +19,35 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
-import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MusicPlayer extends MainActivity {
+public class MusicPlayer {
 
     private MediaPlayer player;
     private int totalTime;
     private SeekBar seekBar;
+    private Button btnPlay;
+    private TextView remainingTime;
+    private TextView elapsedTime;
+    private SongAdapter songsAdapter;
     final private String TAG = "MusicPlayer";
 
 
-
-    public MusicPlayer(SeekBar mySeekBar) {
+    public MusicPlayer(SeekBar mySeekBar, Button myButtonPlay, TextView myRemainingTime, TextView myElapsedTime, SongAdapter mySongAdapter) {
         player = new MediaPlayer();
         totalTime = 0;
-        player = new MediaPlayer();
+        seekBar = mySeekBar;
+        btnPlay = myButtonPlay;
+        remainingTime = myRemainingTime;
+        elapsedTime = myElapsedTime;
+        songsAdapter = mySongAdapter;
     }
 
-
-    public void playFile(final StorageReference mStorageRef, final FirebaseDatabase mDatabaseRef, final Button btnPlay, final SeekBar mySeekBar) {
-        seekBar = mySeekBar;
+    public void playFile(final StorageReference mStorageRef, final FirebaseDatabase mDatabaseRef) {
         final DatabaseReference queueRef = mDatabaseRef.getReference("queue");
         Query lastQuery = queueRef.orderByValue().limitToLast(1);
         lastQuery.addChildEventListener(new ChildEventListener() {
@@ -159,7 +163,6 @@ public class MusicPlayer extends MainActivity {
     private Handler handler = new Handler(){
         @Override
         public void handleMessage(Message msg){
-            remainingTime = findViewById(R.id.remainingTime);
 
             int currentPosition = msg.what;
             seekBar.setProgress(currentPosition);
