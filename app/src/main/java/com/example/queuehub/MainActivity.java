@@ -23,6 +23,8 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.SeekBar;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
@@ -68,6 +70,7 @@ public class MainActivity extends AppCompatActivity {
 
     static MediaPlayer player;
     static Button btnPlay;
+    static Button btnSkip;
     static SeekBar seekBar;
     static TextView elapsedTime;
     static TextView remainingTime;
@@ -88,6 +91,7 @@ public class MainActivity extends AppCompatActivity {
         remainingTime = findViewById(R.id.remainingTime);
         seekBar = findViewById(R.id.seekBar);
         progressBar = findViewById(R.id.loading_spinner);
+        btnSkip = findViewById(R.id.btnSkip);
 
         //for the queue
          List<Song> songs = new ArrayList<>();
@@ -211,6 +215,14 @@ public class MainActivity extends AppCompatActivity {
                                                 player.pause();
                                                 btnPlay.setBackgroundResource(R.drawable.play);
                                             }
+                                        }
+                                    });
+
+                                    btnSkip.setOnClickListener(new View.OnClickListener(){
+
+                                        @Override
+                                        public void onClick(View v) {
+                                            Toast.makeText(getApplicationContext(),"BOOP", Toast.LENGTH_LONG).show();
                                         }
                                     });
                                 }
