@@ -96,7 +96,7 @@ class MusicOnDB {
     }
 
 
-    //to get the names of the songs in the queue
+    // To get the names of the songs in the queue
     public void getSongs(FirebaseDatabase database, final songNamesCallback songsCallback){
 
         database.getInstance().getReference().child("queue")
