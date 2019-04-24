@@ -58,7 +58,8 @@ class MusicOnDB {
         // Create file metadata including the content type
         StorageMetadata metadata = new StorageMetadata.Builder()
                 .setContentType("image/jpg")
-                .setCustomMetadata("myCustomProperty", "myValue")
+                .setCustomMetadata("Song Title", songTitles)
+                .setCustomMetadata("Song Artist", songArtists)
                 .build();
 
         // Update metadata properties
