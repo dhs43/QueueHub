@@ -31,6 +31,8 @@ dependencies {
     implementation 'com.android.support:recyclerview-v7:28.0.0'
     implementation 'com.google.firebase:firebase-core:16.0.8' //Firebase
     implementation 'com.google.firebase:firebase-database:16.1.0' //Firebase database
+    implementation project(':spotify-queuehub') // Spotify
+    implementation "com.google.code.gson:gson:2.8.5"// Spotify
 }
 
 apply plugin: 'com.google.gms.google-services' //Firebase

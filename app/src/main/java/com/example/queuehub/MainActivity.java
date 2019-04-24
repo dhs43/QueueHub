@@ -1,16 +1,15 @@
 package com.example.queuehub;
 
 import android.Manifest;
-import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -24,16 +23,12 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.ChildEventListener;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
-import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -52,27 +47,41 @@ public class MainActivity extends AppCompatActivity {
     private StorageReference mStorageRef;
 
 
-    MediaPlayer player;
+    static MediaPlayer player;
     Button btnPlay;
     ImageView ivCover;
     SeekBar seekBar;
     TextView elapsedTime;
     TextView remainingTime;
     ProgressBar progressBar;
+    Button btnSkip;
     int totalTime;
+
+    //for the queue
+    SongAdapter songsAdapter;
+    RecyclerView rvSongs;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        //also need to set cover art
+        ivCover = findViewById(R.id.ivCover);
+        seekBar = findViewById(R.id.seekBar);
         btnPlay = findViewById(R.id.btnPlay);
         elapsedTime = findViewById(R.id.elapsedTime);
         remainingTime = findViewById(R.id.remainingTime);
-        seekBar = findViewById(R.id.seekBar);
-        //also need to set cover art
-        ivCover = findViewById(R.id.ivCover);
         progressBar = findViewById(R.id.loading_spinner);
+        btnSkip = findViewById(R.id.btnSkip);
+        player = new MediaPlayer();
+
+        //for the queue
+        List<Song> songs = new ArrayList<>();
+        rvSongs = findViewById(R.id.rvSongs);
+        songsAdapter = new SongAdapter(this, songs, btnPlay, seekBar);
+        rvSongs.setLayoutManager(new LinearLayoutManager(this));
+        rvSongs.setAdapter(songsAdapter);
 
         Button btnSelectFile = findViewById(R.id.btnSelectFile);
 
@@ -100,141 +109,12 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        final DatabaseReference queueRef = mDatabaseRef.getReference("queue");
-        Query lastQuery = queueRef.orderByValue().limitToLast(1);
-        lastQuery.addChildEventListener(new ChildEventListener() {
-            @Override
-            public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-                MusicOnDB musicOnDB = new MusicOnDB();
-                String filename = (dataSnapshot.getKey());
-                musicOnDB.getFileUrl(filename, mStorageRef, new MusicOnDB.DatabaseCallback() {
-                    @Override
-                    public void onCallback(String fileURL) {
-                        player = new MediaPlayer();
-                        player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-                            @Override
-                            public void onCompletion(MediaPlayer mp) {
-                                btnPlay.setBackgroundResource(R.drawable.play);
-                            }
-                        });
-                        try {
-                            player.setDataSource(fileURL);
-                            player.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
-                                @Override
-                                public void onPrepared(MediaPlayer mp) {
-                                    //adding seek bar in here
-                                    totalTime = player.getDuration();
-                                    seekBar.setMax(totalTime);
-                                    //seek bar
-                                    seekBar.setOnSeekBarChangeListener(
-                                            new SeekBar.OnSeekBarChangeListener() {
-                                                @Override
-                                                public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                                                    if(fromUser){
-                                                        player.seekTo(progress);
-                                                        seekBar.setProgress(progress);
-                                                    }
-                                                }
 
-                                                @Override
-                                                public void onStartTrackingTouch(SeekBar seekBar) {
-
-                                                }
-
-                                                @Override
-                                                public void onStopTrackingTouch(SeekBar seekBar) {
-
-                                                }
-                                            }
-                                    );
-
-                                    new Thread(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            while(player != null) {
-                                                try{
-                                                    Message msg = new Message();
-                                                    msg.what = player.getCurrentPosition();
-                                                    handler.sendMessage(msg);
-                                                    Thread.sleep(1000);
-                                                } catch (InterruptedException e) {}
-                                            }
-                                        }
-                                    }).start();
-                                    //end seek bar addition
-                                    //player.start();
-                                    btnPlay.setBackgroundResource(R.drawable.stop);
-                                    btnPlay.setOnClickListener(new View.OnClickListener() {
-                                        @Override
-                                        public void onClick(View v) {
-                                            if (!player.isPlaying()) {
-                                                //stopping
-                                                player.start();
-                                                btnPlay.setBackgroundResource(R.drawable.stop);
-                                            } else {
-                                                //playing
-                                                player.pause();
-                                                btnPlay.setBackgroundResource(R.drawable.play);
-                                            }
-                                        }
-                                    });
-                                }
-                            });
-                            player.prepare();
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                });
-            }
-
-            @Override
-            public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-            }
-
-            @Override
-            public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
-            }
-
-            @Override
-            public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-                Log.e(TAG, databaseError.getMessage());
-            }
-        });
+        // Instantiate a MusicPlayer
+        MusicPlayer mMusicPlayer = new MusicPlayer(seekBar, btnPlay, remainingTime, elapsedTime, songsAdapter, btnSkip);
+        // This line can be moved to wherever we need to play the song.
+        mMusicPlayer.playFile(mStorageRef,mDatabaseRef);
     }
-
-    //seek bar helper functions
-    @SuppressLint("HandlerLeak")
-    private Handler handler = new Handler(){
-        @Override
-        public void handleMessage(Message msg){
-            int currentPosition = msg.what;
-            seekBar.setProgress(currentPosition);
-
-            String elapsed = createTimeLabel(currentPosition);
-            elapsedTime.setText(elapsed);
-
-            String remaining = createTimeLabel(totalTime - currentPosition);
-            remainingTime.setText("- " + remaining);
-        }
-    };
-
-    public String createTimeLabel(int time){
-        String timeLabel = "";
-        int min = time / 1000 / 60;
-        int sec = time / 1000 % 60;
-
-        timeLabel = min + ":";
-        if(sec < 10) timeLabel += "0";
-        timeLabel += sec;
-
-        return timeLabel;
-    }
-    //end seek bar helper functions
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {

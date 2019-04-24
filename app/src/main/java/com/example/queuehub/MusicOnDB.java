@@ -8,12 +8,18 @@ import android.widget.ProgressBar;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.StorageMetadata;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 import java.util.Objects;
 
 class MusicOnDB {
@@ -34,10 +40,15 @@ class MusicOnDB {
         }else{
             filename = idStr;
         }
+
+        StorageMetadata metadata = new StorageMetadata.Builder()
+                .setContentType("audio")
+                .setCustomMetadata("name", "test")
+                .build();
+
         StorageReference musicRef;
         musicRef = storageRef.child("music/" + filename);
-
-        musicRef.putFile(file)
+        musicRef.putFile(file, metadata)
                 .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                     @Override
                     public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
@@ -82,5 +93,31 @@ class MusicOnDB {
 
     public interface DatabaseCallback {
         void onCallback(String thisURL);
+    }
+
+
+    // To get the names of the songs in the queue
+    public void getSongs(FirebaseDatabase database, final songNamesCallback songsCallback){
+        Log.d("fetchingFirebase0", "getSongs");
+        database.getInstance().getReference().child("queue")
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        List<String> songNames = new ArrayList<>();
+                        for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                            String song = snapshot.getKey();
+                            songNames.add(song);
+                        }
+                        songsCallback.onCallback(songNames);
+                    }
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+                    }
+                });
+    }
+
+    public interface songNamesCallback {
+        void onCallback(List<String> songNames);
     }
 }
