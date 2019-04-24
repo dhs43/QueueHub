@@ -27,53 +27,56 @@ import java.util.List;
 
 public class MusicPlayer {
 
-    private MediaPlayer player;
     private int totalTime;
     private SeekBar seekBar;
     private Button btnPlay;
     private TextView remainingTime;
     private TextView elapsedTime;
     private SongAdapter songsAdapter;
+    private Button btnSkip;
     final private String TAG = "MusicPlayer";
 
 
-    public MusicPlayer(SeekBar mySeekBar, Button myButtonPlay, TextView myRemainingTime, TextView myElapsedTime, SongAdapter mySongAdapter) {
-        player = new MediaPlayer();
+    public MusicPlayer(SeekBar mySeekBar, Button myButtonPlay, TextView myRemainingTime, TextView myElapsedTime, SongAdapter mySongAdapter, Button myBtnSkip) {
         totalTime = 0;
         seekBar = mySeekBar;
         btnPlay = myButtonPlay;
         remainingTime = myRemainingTime;
         elapsedTime = myElapsedTime;
         songsAdapter = mySongAdapter;
+        btnSkip = myBtnSkip;
+
     }
 
     public void playFile(final StorageReference mStorageRef, final FirebaseDatabase mDatabaseRef) {
+        Log.d("fetchingFirebase1", "getSongs");
         final DatabaseReference queueRef = mDatabaseRef.getReference("queue");
         Query lastQuery = queueRef.orderByValue().limitToLast(1);
         lastQuery.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
-                MusicOnDB musicOnDB = new MusicOnDB();
+                Log.d("fetchingFirebase2", "getSongs");
+                final MusicOnDB musicOnDB = new MusicOnDB();
                 String filename = (dataSnapshot.getKey());
                 musicOnDB.getFileUrl(filename, mStorageRef, new MusicOnDB.DatabaseCallback() {
                     @Override
                     public void onCallback(String fileURL) {
                         // Release memory from previously-playing player
-                        player.release();
-                        player = new MediaPlayer();
-                        player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                        MainActivity.player.release();
+                        MainActivity.player = new MediaPlayer();
+                        MainActivity.player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
                             @Override
                             public void onCompletion(MediaPlayer mp) {
                                 btnPlay.setBackgroundResource(R.drawable.play);
                             }
                         });
                         try {
-                            player.setDataSource(fileURL);
-                            player.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+                            MainActivity.player.setDataSource(fileURL);
+                            MainActivity.player.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
                                 @Override
                                 public void onPrepared(MediaPlayer mp) {
                                     //adding seek bar in here
-                                    totalTime = player.getDuration();
+                                    totalTime = MainActivity.player.getDuration();
                                     seekBar.setMax(totalTime);
                                     //seek bar
                                     seekBar.setOnSeekBarChangeListener(
@@ -81,7 +84,7 @@ public class MusicPlayer {
                                                 @Override
                                                 public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                                                     if (fromUser) {
-                                                        player.seekTo(progress);
+                                                        MainActivity.player.seekTo(progress);
                                                         seekBar.setProgress(progress);
                                                     }
                                                 }
@@ -101,10 +104,10 @@ public class MusicPlayer {
                                     new Thread(new Runnable() {
                                         @Override
                                         public void run() {
-                                            while (player != null) {
+                                            while (MainActivity.player != null) {
                                                 try {
                                                     Message msg = new Message();
-                                                    msg.what = player.getCurrentPosition();
+                                                    msg.what = MainActivity.player.getCurrentPosition();
                                                     handler.sendMessage(msg);
                                                     Thread.sleep(1000);
                                                 } catch (InterruptedException e) {
@@ -118,24 +121,42 @@ public class MusicPlayer {
                                     btnPlay.setOnClickListener(new View.OnClickListener() {
                                         @Override
                                         public void onClick(View v) {
-                                            if (!player.isPlaying()) {
+                                            if (!MainActivity.player.isPlaying()) {
                                                 //stopping
-                                                player.start();
+                                                MainActivity.player.start();
                                                 seekBar.setBackgroundColor(Color.TRANSPARENT);
                                                 btnPlay.setBackgroundResource(R.drawable.stop);
                                             } else {
                                                 //playing
-                                                player.pause();
+                                                MainActivity.player.pause();
                                                 btnPlay.setBackgroundResource(R.drawable.play);
                                             }
                                         }
                                     });
+
+                                    btnSkip.setOnClickListener(new View.OnClickListener(){
+                                        @Override
+                                        public void onClick(View v) {
+                                            //
+                                        }
+                                    });
                                 }
                             });
-                            player.prepare();
+                            MainActivity.player.prepare();
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
+
+                        final List<Song> songList = new ArrayList<>();
+                        musicOnDB.getSongs(mDatabaseRef, new MusicOnDB.songNamesCallback() {
+                            @Override
+                            public void onCallback(List<String> songNames) {
+                                for(String name : songNames){
+                                    songList.add(new Song(name, "Unknown"));
+                                }
+                                populateQueue(songList);
+                            }
+                        });
                     }
                 });
             }

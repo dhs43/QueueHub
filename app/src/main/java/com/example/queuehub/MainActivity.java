@@ -47,13 +47,14 @@ public class MainActivity extends AppCompatActivity {
     private StorageReference mStorageRef;
 
 
-    MediaPlayer player;
+    static MediaPlayer player;
     Button btnPlay;
     ImageView ivCover;
     SeekBar seekBar;
     TextView elapsedTime;
     TextView remainingTime;
     ProgressBar progressBar;
+    Button btnSkip;
     int totalTime;
 
     //for the queue
@@ -72,11 +73,13 @@ public class MainActivity extends AppCompatActivity {
         elapsedTime = findViewById(R.id.elapsedTime);
         remainingTime = findViewById(R.id.remainingTime);
         progressBar = findViewById(R.id.loading_spinner);
+        btnSkip = findViewById(R.id.btnSkip);
+        player = new MediaPlayer();
 
         //for the queue
         List<Song> songs = new ArrayList<>();
         rvSongs = findViewById(R.id.rvSongs);
-        songsAdapter = new SongAdapter(this, songs);
+        songsAdapter = new SongAdapter(this, songs, btnPlay, seekBar);
         rvSongs.setLayoutManager(new LinearLayoutManager(this));
         rvSongs.setAdapter(songsAdapter);
 
@@ -106,9 +109,9 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        // Instantiate a MusicPlayer
-        MusicPlayer mMusicPlayer = new MusicPlayer(seekBar, btnPlay, remainingTime, elapsedTime, songsAdapter);
 
+        // Instantiate a MusicPlayer
+        MusicPlayer mMusicPlayer = new MusicPlayer(seekBar, btnPlay, remainingTime, elapsedTime, songsAdapter, btnSkip);
         // This line can be moved to wherever we need to play the song.
         mMusicPlayer.playFile(mStorageRef,mDatabaseRef);
     }
