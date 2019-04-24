@@ -43,13 +43,13 @@ class MusicOnDB {
         String songArtists;
         byte[] songBitMaps;
         MetadataParser parser = new MetadataParser();
-        songTitles = parser.getSongTitle(filename);
-        songArtists = parser.getSongArtist(filename);
-        try {
-            songBitMaps = parser.getSongBtyeArray(filename);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        songTitles = parser.getSongTitle(idStr);
+        //songArtists = parser.getSongArtist(filename);
+        //try {
+        //songBitMaps = parser.getSongBtyeArray(filename);
+        //} catch (IOException e) {
+        //    e.printStackTrace();
+        //}
 
 
         final StorageReference musicRef;
@@ -57,14 +57,16 @@ class MusicOnDB {
 
         // Create file metadata including the content type
         StorageMetadata metadata = new StorageMetadata.Builder()
-                .setContentType("image/jpg")
+                //.setContentType("image/jpg")
                 .setCustomMetadata("Song Title", songTitles)
-                .setCustomMetadata("Song Artist", songArtists)
+                //.setCustomMetadata("Song Artist", songArtists)
                 .build();
 
         // Update metadata properties
         musicRef.updateMetadata(metadata);
 
+        String Title = metadata.getCustomMetadata("Song Title");
+        //String Artist = metadata.getCustomMetadata("Song Artist");
         musicRef.putFile(file)
                 .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                     @Override
