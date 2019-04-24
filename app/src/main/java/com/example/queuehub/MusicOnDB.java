@@ -1,7 +1,5 @@
 package com.example.queuehub;
 
-import android.graphics.BitmapFactory;
-import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.util.Log;
@@ -10,32 +8,15 @@ import android.widget.ProgressBar;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.StorageMetadata;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
-import java.util.ArrayList;
+import java.io.File;
+import java.io.IOException;
 import java.util.Calendar;
-import java.util.List;
-
-
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
-import com.google.firebase.storage.StorageReference;
-import com.google.firebase.storage.UploadTask;
-
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-import java.util.ListIterator;
 import java.util.Objects;
 
 class MusicOnDB {
@@ -57,36 +38,31 @@ class MusicOnDB {
             filename = idStr;
         }
 
+        //get file metadata
+        String songTitles;
+        String songArtists;
+        byte[] songBitMaps;
+        MetadataParser parser = new MetadataParser();
+        songTitles = parser.getSongTitle(filename);
+        songArtists = parser.getSongArtist(filename);
+        try {
+            songBitMaps = parser.getSongBtyeArray(filename);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
+        final StorageReference musicRef;
+        musicRef = storageRef.child("music/" + filename);
+
+        // Create file metadata including the content type
         StorageMetadata metadata = new StorageMetadata.Builder()
-                .setContentType("audio")
-                .setCustomMetadata("name", "test")
+                .setContentType("image/jpg")
+                .setCustomMetadata("myCustomProperty", "myValue")
                 .build();
 
-
-        //retrieves image form uri source and returns in art
-        MediaMetadataRetriever retriever = new MediaMetadataRetriever();
-        retriever.setDataSource(filename);
-        byte[] art = retriever.getEmbeddedPicture();
-
-//========================================================================================
-//  For when we pull 'art' from server how to assign to imageview                              =
-//---------------------------------------------------------------------------------------=
-//        if( art != null ){
-//            imgAlbum.setImageBitmap( BitmapFactory.decodeByteArray(art, 0, art.length));
-//        }
-//        else{
-//            imgAlbum.setImageResource(R.drawable.no_image);
-//        }
-//========================================================================================
-
-        //pretty self explaining
-        MediaMetadataRetriever mmr = new MediaMetadataRetriever();
-        mmr.setDataSource(filename);  //mmr.setDataSource(this, filename); <-- needed?
-        String songTitle = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE);
-        String songArtist = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST);
-
-        StorageReference musicRef;
-        musicRef = storageRef.child("music/" + filename);
+        // Update metadata properties
+        musicRef.updateMetadata(metadata);
 
         musicRef.putFile(file)
                 .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
@@ -112,7 +88,6 @@ class MusicOnDB {
                     }
                 });
 
-        //update the recycler view too
     }
 
 
@@ -137,28 +112,5 @@ class MusicOnDB {
         void onCallback(String thisURL);
     }
 
-    //to get the names of the songs in the queue
-    public void getSongs(FirebaseDatabase database, final songNamesCallback songsCallback){
 
-        database.getInstance().getReference().child("queue")
-                .addListenerForSingleValueEvent(new ValueEventListener() {
-
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        List<String> songNames = new ArrayList<>();
-                        for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                            String song = snapshot.getKey();
-                            songNames.add(song);
-                        }
-                        songsCallback.onCallback(songNames);
-                    }
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-                    }
-                });
-    }
-
-    public interface songNamesCallback {
-        void onCallback(List<String> songNames);
-    }
 }
