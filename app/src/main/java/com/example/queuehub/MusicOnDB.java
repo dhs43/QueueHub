@@ -1,5 +1,6 @@
 package com.example.queuehub;
 
+import android.content.Context;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.util.Log;
@@ -27,7 +28,8 @@ class MusicOnDB {
     final private String TAG = "MusicOnDB";
 
     // Expects a reference to the main Firebase storage and file to upload
-    void uploadMusicFile(final Uri file, StorageReference storageRef, final FirebaseDatabase databaseRef, final ProgressBar progressBar) {
+    void uploadMusicFile(final Uri file, StorageReference storageRef, final FirebaseDatabase databaseRef, final ProgressBar progressBar, Uri fileUri) {
+
         progressBar.setVisibility(View.VISIBLE);
         // Get id of file
         String[] segments = Objects.requireNonNull(file.getPath()).split("/");
@@ -41,10 +43,26 @@ class MusicOnDB {
             filename = idStr;
         }
 
+
+        //get file metadata
+        String songTitles;
+        String songArtists;
+        byte[] songBitMaps;
+        MetadataParser parser = new MetadataParser();
+        songTitles = parser.getSongTitle(fileUri);
+        songArtists = parser.getSongArtist(fileUri);
+        songBitMaps = parser.getSongBtyeArray(fileUri);
+
+        // Create file metadata including the content type
         StorageMetadata metadata = new StorageMetadata.Builder()
-                .setContentType("audio")
-                .setCustomMetadata("name", "test")
+                //.setContentType("image/jpg")
+                .setCustomMetadata("Song Title", songTitles)
+                .setCustomMetadata("Song Artist", songArtists)
                 .build();
+
+        metadata.getCustomMetadata("Song Title");
+        metadata.getCustomMetadata("Song Artist");
+
 
         StorageReference musicRef;
         musicRef = storageRef.child("music/" + filename);
@@ -63,6 +81,22 @@ class MusicOnDB {
 
                             Log.d(TAG, "File uploaded");
                         }
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.e(TAG, e.getMessage());
+                    }
+                });
+
+        StorageReference albumArtRef;
+        albumArtRef = storageRef.child("album_art/" + songTitles);
+        albumArtRef.putBytes(songBitMaps)
+                .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                    @Override
+                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                        Log.d(TAG, "Bitmap uploaded");
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {

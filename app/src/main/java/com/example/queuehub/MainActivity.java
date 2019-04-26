@@ -1,6 +1,7 @@
 package com.example.queuehub;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
 import android.media.MediaPlayer;
 import android.net.Uri;
@@ -56,6 +57,7 @@ public class MainActivity extends AppCompatActivity {
     ProgressBar progressBar;
     Button btnSkip;
     int totalTime;
+    static Context context;
 
     //for the queue
     SongAdapter songsAdapter;
@@ -75,6 +77,7 @@ public class MainActivity extends AppCompatActivity {
         progressBar = findViewById(R.id.loading_spinner);
         btnSkip = findViewById(R.id.btnSkip);
         player = new MediaPlayer();
+        context = this;
 
         //for the queue
         List<Song> songs = new ArrayList<>();
@@ -125,7 +128,7 @@ public class MainActivity extends AppCompatActivity {
                     selectedFile = data.getData();
 
                     MusicOnDB musicOnDB = new MusicOnDB();
-                    musicOnDB.uploadMusicFile(selectedFile, mStorageRef, mDatabaseRef, progressBar);
+                    musicOnDB.uploadMusicFile(selectedFile, mStorageRef, mDatabaseRef, progressBar, selectedFile);
                 }
             }
         }
