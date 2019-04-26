@@ -18,6 +18,7 @@ import com.google.firebase.storage.StorageMetadata;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -45,19 +46,46 @@ class MusicOnDB {
 
 
         //get file metadata
-        String songTitles;
-        String songArtists;
-        byte[] songBitMaps;
+        String songTitle;
+        String songArtist;
+        byte[] songBitMap;
         MetadataParser parser = new MetadataParser();
-        songTitles = parser.getSongTitle(fileUri);
-        songArtists = parser.getSongArtist(fileUri);
-        songBitMaps = parser.getSongBtyeArray(fileUri);
+        songTitle = parser.getSongTitle(fileUri);
+        songArtist = parser.getSongArtist(fileUri);
+        songBitMap = parser.getSongBtyeArray(fileUri);
+
+        // Upload album art to Firebase
+        final StorageReference albumArtRef;
+        albumArtRef = storageRef.child("album_art/" + songTitle);
+        albumArtRef.putBytes(songBitMap)
+                .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                    @Override
+                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                        Log.d(TAG, "Bitmap uploaded");
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.e(TAG, e.getMessage());
+                    }
+                });
+
+        // Get URL of album art we just uploaded
+        Uri albumArtUrl;
+        albumArtRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+            @Override
+            public void onSuccess(Uri uri) {
+                // Do stuff here.
+            }
+        });
+
 
         // Create file metadata including the content type
         StorageMetadata metadata = new StorageMetadata.Builder()
                 //.setContentType("image/jpg")
-                .setCustomMetadata("Song Title", songTitles)
-                .setCustomMetadata("Song Artist", songArtists)
+                .setCustomMetadata("Song Title", songTitle)
+                .setCustomMetadata("Song Artist", songArtist)
                 .build();
 
         metadata.getCustomMetadata("Song Title");
@@ -81,22 +109,6 @@ class MusicOnDB {
 
                             Log.d(TAG, "File uploaded");
                         }
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Log.e(TAG, e.getMessage());
-                    }
-                });
-
-        StorageReference albumArtRef;
-        albumArtRef = storageRef.child("album_art/" + songTitles);
-        albumArtRef.putBytes(songBitMaps)
-                .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                    @Override
-                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                        Log.d(TAG, "Bitmap uploaded");
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
