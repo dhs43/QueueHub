@@ -48,6 +48,7 @@ public class MainActivity extends AppCompatActivity {
 
 
     static MediaPlayer player;
+    static String currentSong = "";
     Button btnPlay;
     ImageView ivCover;
     SeekBar seekBar;
@@ -111,7 +112,7 @@ public class MainActivity extends AppCompatActivity {
 
 
         // Instantiate a MusicPlayer
-        MusicPlayer mMusicPlayer = new MusicPlayer(seekBar, btnPlay, remainingTime, elapsedTime, songsAdapter, btnSkip);
+       MusicPlayer mMusicPlayer = new MusicPlayer(seekBar, btnPlay, remainingTime, elapsedTime, songsAdapter, btnSkip, currentSong);
         // This line can be moved to wherever we need to play the song.
         mMusicPlayer.playFile(mStorageRef,mDatabaseRef);
     }

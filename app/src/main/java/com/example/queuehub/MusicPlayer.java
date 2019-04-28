@@ -1,6 +1,8 @@
 package com.example.queuehub;
 
 import android.annotation.SuppressLint;
+import android.app.Application;
+import android.content.Context;
 import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.os.Handler;
@@ -12,6 +14,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.SeekBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
@@ -19,6 +22,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
+import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
 import java.io.IOException;
@@ -34,10 +38,11 @@ public class MusicPlayer {
     private TextView elapsedTime;
     private SongAdapter songsAdapter;
     private Button btnSkip;
+    private String currentSong;
     final private String TAG = "MusicPlayer";
 
 
-    public MusicPlayer(SeekBar mySeekBar, Button myButtonPlay, TextView myRemainingTime, TextView myElapsedTime, SongAdapter mySongAdapter, Button myBtnSkip) {
+    public MusicPlayer(SeekBar mySeekBar, Button myButtonPlay, TextView myRemainingTime, TextView myElapsedTime, SongAdapter mySongAdapter, Button myBtnSkip, String song) {
         totalTime = 0;
         seekBar = mySeekBar;
         btnPlay = myButtonPlay;
@@ -45,11 +50,21 @@ public class MusicPlayer {
         elapsedTime = myElapsedTime;
         songsAdapter = mySongAdapter;
         btnSkip = myBtnSkip;
-
+        currentSong = song;
     }
+
+    public String getCurrentSong(){
+        return currentSong;
+    }
+
+    public void setCurrentSong(String newSong){
+        currentSong = newSong;
+    }
+
 
     public void playFile(final StorageReference mStorageRef, final FirebaseDatabase mDatabaseRef) {
         Log.d("fetchingFirebase1", "getSongs");
+        currentSong = MainActivity.currentSong;
         final DatabaseReference queueRef = mDatabaseRef.getReference("queue");
         Query lastQuery = queueRef.orderByValue().limitToLast(1);
         lastQuery.addChildEventListener(new ChildEventListener() {
@@ -57,13 +72,15 @@ public class MusicPlayer {
             public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
                 Log.d("fetchingFirebase2", "getSongs");
                 final MusicOnDB musicOnDB = new MusicOnDB();
-                String filename = (dataSnapshot.getKey());
+                final String filename = (dataSnapshot.getKey());
+                MainActivity.currentSong = filename;
                 musicOnDB.getFileUrl(filename, mStorageRef, new MusicOnDB.DatabaseCallback() {
                     @Override
                     public void onCallback(String fileURL) {
                         // Release memory from previously-playing player
                         MainActivity.player.release();
                         MainActivity.player = new MediaPlayer();
+                        currentSong = MainActivity.currentSong;
                         MainActivity.player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
                             @Override
                             public void onCompletion(MediaPlayer mp) {
@@ -137,7 +154,100 @@ public class MusicPlayer {
                                     btnSkip.setOnClickListener(new View.OnClickListener(){
                                         @Override
                                         public void onClick(View v) {
-                                            //
+                                            musicOnDB.getSongs(mDatabaseRef, new MusicOnDB.songNamesCallback() {
+                                                @Override
+                                                public void onCallback(List<String> songNames) {
+                                                    String next = songNames.get(0);
+                                                    for(int i = 0; i < songNames.size()-1; i++)
+                                                    {
+                                                        if(songNames.get(i).equals(currentSong))
+                                                        {
+                                                            next = songNames.get(i+1);
+                                                            break;
+                                                        }
+                                                    }
+                                                    MainActivity.currentSong = next;
+                                                    currentSong = MainActivity.currentSong;
+
+                                                    MusicOnDB musicOnDB = new MusicOnDB();
+                                                    StorageReference mStorageRef = FirebaseStorage.getInstance().getReference();
+
+                                                    musicOnDB.getFileUrl(next, mStorageRef, new MusicOnDB.DatabaseCallback() {
+                                                        @Override
+                                                        public void onCallback(String thisURL) {
+
+
+                                                            MainActivity.player.stop();
+                                                            btnPlay.setBackgroundResource(R.drawable.play);
+
+                                                            MainActivity.player = new MediaPlayer();
+                                                            //player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                                                            //  @Override
+                                                            //public void onCompletion(MediaPlayer mp) {
+                                                            //  btnPlay.setBackgroundResource(R.drawable.play);
+                                                            //}
+                                                            //});
+                                                            try {
+                                                                Log.d("fetchingFirebase3", "getSongs");
+                                                                MainActivity.player.setDataSource(thisURL);
+                                                                MainActivity.player.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+                                                                    @Override
+                                                                    public void onPrepared(MediaPlayer mp) {
+                                                                        //adding seek bar in here
+                                                                        int totalTime = MainActivity.player.getDuration();
+                                                                        seekBar.setMax(totalTime);
+                                                                        //seek bar
+                                                                        seekBar.setOnSeekBarChangeListener(
+                                                                                new SeekBar.OnSeekBarChangeListener() {
+                                                                                    @Override
+                                                                                    public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                                                                                        if(fromUser){
+                                                                                            MainActivity.player.seekTo(progress);
+                                                                                            seekBar.setProgress(progress);
+                                                                                        }
+                                                                                    }
+
+                                                                                    @Override
+                                                                                    public void onStartTrackingTouch(SeekBar seekBar) {
+
+                                                                                    }
+
+                                                                                    @Override
+                                                                                    public void onStopTrackingTouch(SeekBar seekBar) {
+
+                                                                                    }
+                                                                                }
+                                                                        );
+
+                                                                        new Thread(new Runnable() {
+                                                                            @Override
+                                                                            public void run() {
+                                                                                while(MainActivity.player != null) {
+                                                                                    try{
+                                                                                        Message msg = new Message();
+                                                                                        msg.what = MainActivity.player.getCurrentPosition();
+                                                                                        //handler.sendMessage(msg);
+                                                                                        Thread.sleep(1000);
+                                                                                    } catch (InterruptedException e) {}
+                                                                                }
+                                                                            }
+                                                                        }).start();
+                                                                        //end seek bar addition
+                                                                        MainActivity.player.start();
+                                                                        seekBar.setBackgroundColor(Color.LTGRAY); // Temporary to show when player is ready
+                                                                        btnPlay.setBackgroundResource(R.drawable.stop);
+                                                                    }
+                                                                });
+                                                                MainActivity.player.prepare();
+                                                            } catch (IOException e) {
+                                                                e.printStackTrace();
+                                                            }
+                                                        }
+                                                    });
+
+
+                                                }
+                                            });
                                         }
                                     });
                                 }
@@ -147,16 +257,7 @@ public class MusicPlayer {
                             e.printStackTrace();
                         }
 
-                        final List<Song> songList = new ArrayList<>();
-                        musicOnDB.getSongs(mDatabaseRef, new MusicOnDB.songNamesCallback() {
-                            @Override
-                            public void onCallback(List<String> songNames) {
-                                for(String name : songNames){
-                                    songList.add(new Song(name, "Unknown"));
-                                }
-                                populateQueue(songList);
-                            }
-                        });
+                        updateQueue(mDatabaseRef);
                     }
                 });
             }

@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.os.Message;
+import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -12,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -30,6 +32,7 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder>{
     private OnItemClickListener listener;
     private Button btnPlay;
     private SeekBar seekBar;
+
 
 
     public interface  OnItemClickListener{
@@ -83,6 +86,7 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder>{
         public ImageView ivCoverArt;
         public TextView tvSongTitle;
         public TextView tvArtist;
+        private RelativeLayout backRL;
 
 
         public ViewHolder(View itemView){
@@ -90,6 +94,12 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder>{
             ivCoverArt = itemView.findViewById(R.id.ivCoverArt);
             tvArtist = itemView.findViewById(R.id.tvArtist);
             tvSongTitle = itemView.findViewById(R.id.tvSongTitle);
+            backRL = itemView.findViewById(R.id.backRL);
+
+            if(MainActivity.currentSong == tvSongTitle.getText().toString()) {
+                backRL.setBackgroundColor(Color.GRAY);
+            }
+
         }
 
         public void bind(final Song song, final OnItemClickListener listener){
@@ -106,7 +116,8 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder>{
                     musicOnDB.getFileUrl(selection, mStorageRef, new MusicOnDB.DatabaseCallback() {
                         @Override
                         public void onCallback(String thisURL) {
-
+                            MainActivity.currentSong = song.getTitle();
+                            backRL.setBackgroundColor(Color.GRAY);
 
                             MainActivity.player.stop();
                             btnPlay.setBackgroundResource(R.drawable.play);
