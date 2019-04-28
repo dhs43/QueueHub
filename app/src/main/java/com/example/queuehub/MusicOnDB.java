@@ -71,15 +71,6 @@ class MusicOnDB {
                     }
                 });
 
-        // Get URL of album art we just uploaded
-        Uri albumArtUrl;
-        albumArtRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-            @Override
-            public void onSuccess(Uri uri) {
-                // Do stuff here.
-            }
-        });
-
 
         // Create file metadata including the content type
         StorageMetadata metadata = new StorageMetadata.Builder()
@@ -136,6 +127,23 @@ class MusicOnDB {
             }
         });
     }
+
+
+    void getAlbumArtUrl(String filename, StorageReference storageRef, final DatabaseCallback databaseCallback) {
+
+        storageRef.child("album_art").getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+            @Override
+            public void onSuccess(Uri uri) {
+                String fileURL = uri.toString();
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Log.e(TAG, e.getMessage());
+            }
+        });
+    }
+
 
     public interface DatabaseCallback {
         void onCallback(String thisURL);
