@@ -1,5 +1,7 @@
 package com.example.queuehub;
 
+import android.graphics.BitmapFactory;
+import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.util.Log;
@@ -72,7 +74,6 @@ class MusicOnDB {
                     }
                 });
     }
-
 
     void getFileUrl(String filename, StorageReference storageRef, final DatabaseCallback databaseCallback) {
 

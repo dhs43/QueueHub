@@ -2,6 +2,8 @@ package com.example.queuehub;
 
 import android.Manifest;
 import android.content.Intent;
+import android.graphics.Color;
+
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
@@ -10,6 +12,7 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -26,6 +29,9 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -62,6 +68,7 @@ public class MainActivity extends AppCompatActivity {
     SongAdapter songsAdapter;
     RecyclerView rvSongs;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -78,9 +85,10 @@ public class MainActivity extends AppCompatActivity {
         player = new MediaPlayer();
 
         //for the queue
-        List<Song> songs = new ArrayList<>();
+         List<Song> songs = new ArrayList<>();
         rvSongs = findViewById(R.id.rvSongs);
         songsAdapter = new SongAdapter(this, songs, btnPlay, seekBar);
+
         rvSongs.setLayoutManager(new LinearLayoutManager(this));
         rvSongs.setAdapter(songsAdapter);
 

@@ -4,7 +4,6 @@ import android.content.Context;
 import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.os.Message;
-import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -23,7 +22,6 @@ import com.google.firebase.storage.StorageReference;
 
 import java.io.IOException;
 import java.util.List;
-
 
 public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder>{
 
@@ -54,7 +52,6 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder>{
         holder.tvSongTitle.setText(song.getTitle());
         holder.tvArtist.setText(song.getArtist());
         holder.ivCoverArt.setImageResource(R.drawable.image);
-
         holder.bind(songs.get(position), listener);
     }
 
@@ -188,7 +185,6 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder>{
                     });
                 }
             });
-
         }
     }
 }
