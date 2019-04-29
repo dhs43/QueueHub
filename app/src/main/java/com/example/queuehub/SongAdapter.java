@@ -1,7 +1,6 @@
 package com.example.queuehub;
 
 import android.content.Context;
-import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.os.Message;
 import android.support.annotation.NonNull;
@@ -165,7 +164,6 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder>{
                                         }).start();
                                         //end seek bar addition
                                         MainActivity.player.start();
-                                        seekBar.setBackgroundColor(Color.LTGRAY); // Temporary to show when player is ready
                                         btnPlay.setBackgroundResource(R.drawable.stop);
                                     }
                                 });

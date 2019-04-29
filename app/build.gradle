@@ -37,6 +37,7 @@ dependencies {
     implementation "com.google.code.gson:gson:2.8.5"// Spotify//
     // Add Performance Monitoring dependency line
     implementation 'com.google.firebase:firebase-perf:16.2.5'
+    implementation 'com.sothree.slidinguppanel:library:3.4.0' // Sliding Up Panel: https://github.com/umano/AndroidSlidingUpPanel
 }
 
 apply plugin: 'com.google.gms.google-services' //Firebase

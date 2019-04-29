@@ -116,8 +116,7 @@ public class MusicPlayer {
                                         }
                                     }).start();
                                     //end seek bar addition
-                                    //player.start();
-                                    seekBar.setBackgroundColor(Color.LTGRAY); // Temporary to show when player is ready
+
                                     btnPlay.setOnClickListener(new View.OnClickListener() {
                                         @Override
                                         public void onClick(View v) {
