@@ -280,8 +280,6 @@ public class MusicPlayer {
     //end seek bar helper functions
 
 
-
-
     public void updateQueue (FirebaseDatabase mDatabaseRef) {
         //adding in queue here
         MusicOnDB musicOnDB = new MusicOnDB();
