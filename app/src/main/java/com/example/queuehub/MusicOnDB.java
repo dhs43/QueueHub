@@ -13,6 +13,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageMetadata;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -26,9 +27,9 @@ class MusicOnDB {
     final private String TAG = "MusicOnDB";
 
     // Expects a reference to the main Firebase storage and file to upload
-    void uploadMusicFile(final Uri file, final StorageReference storageRef, final FirebaseDatabase databaseRef, final ProgressBar progressBar, Uri fileUri) {
+    void uploadMusicFile(final Uri file, final StorageReference storageRef, final FirebaseDatabase databaseRef, final ProgressBar uploadProgressBar, Uri fileUri) {
 
-        progressBar.setVisibility(View.VISIBLE);
+        uploadProgressBar.setVisibility(View.VISIBLE);
 
         //get file metadata
         final String songTitle;
@@ -41,7 +42,7 @@ class MusicOnDB {
         songBitMap = parser.getSongBtyeArray(fileUri);
 
         // Upload album art to Firebase
-        if(songBitMap != null) {
+        if (songBitMap != null) {
             final StorageReference albumArtRef;
             albumArtRef = storageRef.child("album_art/" + songTitle);
             albumArtRef.putBytes(songBitMap)
@@ -74,30 +75,35 @@ class MusicOnDB {
                                                         queueRef.child(songTitle).setValue("0");
                                                         Calendar calendar = Calendar.getInstance();
                                                         queueRef.child(songTitle).setValue(calendar.getTimeInMillis());
-                                                        progressBar.setVisibility(View.GONE);
+                                                        uploadProgressBar.setVisibility(View.GONE);
 
                                                         Log.d(TAG, "File uploaded");
                                                     }
                                                 }
-                                            })
-                                            .addOnFailureListener(new OnFailureListener() {
-                                                @Override
-                                                public void onFailure(@NonNull Exception e) {
-                                                    Log.e(TAG, e.getMessage());
-                                                }
-                                            });
+                                            }).addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
+                                        @Override
+                                        public void onProgress(UploadTask.TaskSnapshot taskSnapshot) {
+                                            double progress = (100.0 * taskSnapshot.getBytesTransferred()) / taskSnapshot.getTotalByteCount();
+                                            int currentProgress = (int) progress;
+                                            uploadProgressBar.setProgress(currentProgress);
+                                        }
+                                    }).addOnFailureListener(new OnFailureListener() {
+                                        @Override
+                                        public void onFailure(@NonNull Exception e) {
+                                            Log.e(TAG, e.getMessage());
+                                        }
+                                    });
                                 }
                             });
                             Log.d(TAG, "Bitmap uploaded");
                         }
-                    })
-                    .addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception e) {
-                            Log.e(TAG, e.getMessage());
-                        }
-                    });
-        }else{
+                    }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    Log.e(TAG, e.getMessage());
+                }
+            });
+        } else {
             // This is for when no album art could be extracted.
             // Same code as above, but copied b/c of difficulties with
             //  Firebase's asynchronous functions.
@@ -122,18 +128,23 @@ class MusicOnDB {
                                 queueRef.child(songTitle).setValue("0");
                                 Calendar calendar = Calendar.getInstance();
                                 queueRef.child(songTitle).setValue(calendar.getTimeInMillis());
-                                progressBar.setVisibility(View.GONE);
+                                uploadProgressBar.setVisibility(View.GONE);
 
                                 Log.d(TAG, "File uploaded");
                             }
                         }
-                    })
-                    .addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception e) {
-                            Log.e(TAG, e.getMessage());
-                        }
-                    });
+                    }).addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
+                @Override
+                public void onProgress(UploadTask.TaskSnapshot taskSnapshot) {
+                    double progress = (100.0 * taskSnapshot.getBytesTransferred()) / taskSnapshot.getTotalByteCount();
+                    System.out.println("Upload is " + progress + "% done");
+                }
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    Log.e(TAG, e.getMessage());
+                }
+            });
         }
     }
 
@@ -160,7 +171,7 @@ class MusicOnDB {
     }
 
     // To get the names of the songs in the queue
-    public void getSongs(FirebaseDatabase database, final songNamesCallback songsCallback){
+    public void getSongs(FirebaseDatabase database, final songNamesCallback songsCallback) {
         Log.d("fetchingFirebase0", "getSongs");
         database.getInstance().getReference().child("queue")
                 .addListenerForSingleValueEvent(new ValueEventListener() {
@@ -174,6 +185,7 @@ class MusicOnDB {
                         }
                         songsCallback.onCallback(songNames);
                     }
+
                     @Override
                     public void onCancelled(DatabaseError databaseError) {
                     }

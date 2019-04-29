@@ -25,7 +25,7 @@ import java.util.List;
 public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder>{
 
     private Context context;
-    private List<Song> songs;
+    private List<Song> songsQueue;
     private OnItemClickListener listener;
     private Button btnPlay;
     private SeekBar seekBar;
@@ -38,7 +38,7 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder>{
 
     public SongAdapter(Context context, List<Song> songs, Button myBtnPlay, SeekBar mySeekBar) {
         this.context = context;
-        this.songs = songs;
+        this.songsQueue = songs;
         btnPlay = myBtnPlay;
         seekBar = mySeekBar;
         this.listener = listener;
@@ -46,17 +46,17 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder>{
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        Song song = songs.get(position);
+        Song song = songsQueue.get(position);
         holder.tvSongTitle.setText(song.getTitle());
         holder.tvArtist.setText(song.getArtist());
         holder.ivCoverArt.setImageResource(R.drawable.image);
 
-        holder.bind(songs.get(position), listener);
+        holder.bind(songsQueue.get(position), listener);
     }
 
     @Override
     public int getItemCount() {
-        return songs.size();
+        return songsQueue.size();
     }
 
 
@@ -68,12 +68,12 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder>{
     }
 
     public void clear() {
-        songs.clear();
+        songsQueue.clear();
         notifyDataSetChanged();
     }
 
     public void addSongs(List<Song> songList){
-        songs.addAll(songList);
+        songsQueue.addAll(songList);
         notifyDataSetChanged();
     }
 

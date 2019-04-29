@@ -55,7 +55,7 @@ public class MainActivity extends AppCompatActivity {
     SeekBar seekBar;
     TextView elapsedTime;
     TextView remainingTime;
-    ProgressBar progressBar;
+    ProgressBar uploadProgressBar;
     Button btnSkip;
     int totalTime;
     static Context context;
@@ -75,15 +75,15 @@ public class MainActivity extends AppCompatActivity {
         btnPlay = findViewById(R.id.btnPlay);
         elapsedTime = findViewById(R.id.elapsedTime);
         remainingTime = findViewById(R.id.remainingTime);
-        progressBar = findViewById(R.id.loading_spinner);
         btnSkip = findViewById(R.id.btnSkip);
+        uploadProgressBar = findViewById(R.id.determinateBar);
         player = new MediaPlayer();
         context = this;
 
         //for the queue
-        List<Song> songs = new ArrayList<>();
+        List<Song> songsQueue = new ArrayList<>();
         rvSongs = findViewById(R.id.rvSongs);
-        songsAdapter = new SongAdapter(this, songs, btnPlay, seekBar);
+        songsAdapter = new SongAdapter(this, songsQueue, btnPlay, seekBar);
         rvSongs.setLayoutManager(new LinearLayoutManager(this));
         rvSongs.setAdapter(songsAdapter);
 
@@ -129,7 +129,7 @@ public class MainActivity extends AppCompatActivity {
                     selectedFile = data.getData();
 
                     MusicOnDB musicOnDB = new MusicOnDB();
-                    musicOnDB.uploadMusicFile(selectedFile, mStorageRef, mDatabaseRef, progressBar, selectedFile);
+                    musicOnDB.uploadMusicFile(selectedFile, mStorageRef, mDatabaseRef, uploadProgressBar, selectedFile);
                 }
             }
         }
