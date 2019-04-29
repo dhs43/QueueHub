@@ -18,7 +18,9 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.SeekBar;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -120,9 +122,11 @@ public class MainActivity extends AppCompatActivity {
 
 
         // Instantiate a MusicPlayer
-       MusicPlayer mMusicPlayer = new MusicPlayer(seekBar, btnPlay, remainingTime, elapsedTime, songsAdapter, btnSkip, currentSong);
+       MusicPlayer mMusicPlayer = new MusicPlayer(seekBar, btnPlay, remainingTime, elapsedTime, songsAdapter, btnSkip);
         // This line can be moved to wherever we need to play the song.
         mMusicPlayer.playFile(mStorageRef,mDatabaseRef);
+
+
     }
 
     @Override

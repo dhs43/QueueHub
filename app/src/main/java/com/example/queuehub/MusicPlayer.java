@@ -38,11 +38,10 @@ public class MusicPlayer {
     private TextView elapsedTime;
     private SongAdapter songsAdapter;
     private Button btnSkip;
-    private String currentSong;
     final private String TAG = "MusicPlayer";
 
 
-    public MusicPlayer(SeekBar mySeekBar, Button myButtonPlay, TextView myRemainingTime, TextView myElapsedTime, SongAdapter mySongAdapter, Button myBtnSkip, String song) {
+    public MusicPlayer(SeekBar mySeekBar, Button myButtonPlay, TextView myRemainingTime, TextView myElapsedTime, SongAdapter mySongAdapter, Button myBtnSkip) {
         totalTime = 0;
         seekBar = mySeekBar;
         btnPlay = myButtonPlay;
@@ -50,21 +49,12 @@ public class MusicPlayer {
         elapsedTime = myElapsedTime;
         songsAdapter = mySongAdapter;
         btnSkip = myBtnSkip;
-        currentSong = song;
     }
 
-    public String getCurrentSong(){
-        return currentSong;
-    }
-
-    public void setCurrentSong(String newSong){
-        currentSong = newSong;
-    }
 
 
     public void playFile(final StorageReference mStorageRef, final FirebaseDatabase mDatabaseRef) {
         Log.d("fetchingFirebase1", "getSongs");
-        currentSong = MainActivity.currentSong;
         final DatabaseReference queueRef = mDatabaseRef.getReference("queue");
         Query lastQuery = queueRef.orderByValue().limitToLast(1);
         lastQuery.addChildEventListener(new ChildEventListener() {
@@ -80,7 +70,6 @@ public class MusicPlayer {
                         // Release memory from previously-playing player
                         MainActivity.player.release();
                         MainActivity.player = new MediaPlayer();
-                        currentSong = MainActivity.currentSong;
                         MainActivity.player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
                             @Override
                             public void onCompletion(MediaPlayer mp) {
@@ -160,14 +149,15 @@ public class MusicPlayer {
                                                     String next = songNames.get(0);
                                                     for(int i = 0; i < songNames.size()-1; i++)
                                                     {
-                                                        if(songNames.get(i).equals(currentSong))
+                                                        if(songNames.get(i).equals(MainActivity.currentSong))
                                                         {
                                                             next = songNames.get(i+1);
                                                             break;
                                                         }
                                                     }
+
                                                     MainActivity.currentSong = next;
-                                                    currentSong = MainActivity.currentSong;
+                                                    songsAdapter.notifyDataSetChanged();
 
                                                     MusicOnDB musicOnDB = new MusicOnDB();
                                                     StorageReference mStorageRef = FirebaseStorage.getInstance().getReference();

@@ -23,6 +23,8 @@ import com.google.firebase.storage.StorageReference;
 import java.io.IOException;
 import java.util.List;
 
+import static com.example.queuehub.MainActivity.currentSong;
+
 public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder>{
 
     private Context context;
@@ -30,7 +32,6 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder>{
     private OnItemClickListener listener;
     private Button btnPlay;
     private SeekBar seekBar;
-
 
 
     public interface  OnItemClickListener{
@@ -93,13 +94,22 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder>{
             tvSongTitle = itemView.findViewById(R.id.tvSongTitle);
             backRL = itemView.findViewById(R.id.backRL);
 
-            if(MainActivity.currentSong == tvSongTitle.getText().toString()) {
-                backRL.setBackgroundColor(Color.GRAY);
-            }
-
         }
 
+
+
+
         public void bind(final Song song, final OnItemClickListener listener){
+            String title = song.getTitle();
+            if(title.matches(currentSong))
+            {
+                backRL.setBackgroundColor(Color.GRAY);
+            }
+            else
+            {
+                backRL.setBackgroundColor(939393);
+            }
+
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -113,8 +123,9 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder>{
                     musicOnDB.getFileUrl(selection, mStorageRef, new MusicOnDB.DatabaseCallback() {
                         @Override
                         public void onCallback(String thisURL) {
-                            MainActivity.currentSong = song.getTitle();
+                            currentSong = song.getTitle();
                             backRL.setBackgroundColor(Color.GRAY);
+                            notifyDataSetChanged();
 
                             MainActivity.player.stop();
                             btnPlay.setBackgroundResource(R.drawable.play);

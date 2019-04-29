@@ -122,39 +122,4 @@ class MusicOnDB {
         void onCallback(List<String> songNames);
     }
 
-    /*public String getNextSong(FirebaseDatabase database, String currentSong, final nextSongCallback songsCallback){
-        Log.d("fetchingFirebase0", "getSongs");
-        final List<String> songNames = new ArrayList<>();
-        database.getInstance().getReference().child("queue")
-                .addListenerForSingleValueEvent(new ValueEventListener() {
-
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-
-                        for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                            String song = snapshot.getKey();
-                            songNames.add(song);
-                        }
-                        songsCallback.onCallback(songNames);
-                    }
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-                    }
-                });
-        String next = songNames.get(0);
-        for(int i = 0; i < songNames.size(); i++)
-        {
-            if(songNames.get(i).equals(currentSong))
-            {
-                next = songNames.get(i+1);
-                break;
-            }
-        }
-        return next;
-    }
-
-    public interface nextSongCallback {
-        void onCallback(List<String> songNames);
-    }
-    */
 }
