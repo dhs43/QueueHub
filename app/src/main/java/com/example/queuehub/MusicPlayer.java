@@ -19,6 +19,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
+import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
 import java.io.IOException;
@@ -136,7 +137,86 @@ public class MusicPlayer {
                                     btnSkip.setOnClickListener(new View.OnClickListener(){
                                         @Override
                                         public void onClick(View v) {
-                                            //
+                                            MainActivity.player.stop();
+                                            musicOnDB.getSongs(mDatabaseRef, new MusicOnDB.songNamesCallback() {
+                                                @Override
+                                                public void onCallback(List<String> songNames) {
+                                                    String next = songNames.get(0);
+                                                    for(int i = 0; i < songNames.size()-1; i++)
+                                                    {
+                                                        if(songNames.get(i).equals(MainActivity.currentSong))
+                                                        {
+                                                            next = songNames.get(i+1);
+                                                            break;
+                                                        }
+                                                    }
+                                                    MainActivity.currentSong = next;
+
+                                                    MusicOnDB musicOnDB = new MusicOnDB();
+                                                    StorageReference mStorageRef = FirebaseStorage.getInstance().getReference();
+
+                                                    musicOnDB.getFileUrl(next, mStorageRef, new MusicOnDB.DatabaseCallback() {
+                                                        @Override
+                                                        public void onCallback(String thisURL) {
+
+                                                            MainActivity.player.stop();
+                                                            btnPlay.setBackgroundResource(R.drawable.play);
+
+                                                            MainActivity.player = new MediaPlayer();
+
+                                                            try {
+                                                                Log.d("fetchingFirebase3", "getSongs");
+                                                                MainActivity.player.setDataSource(thisURL);
+                                                                MainActivity.player.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+                                                                    @Override
+                                                                    public void onPrepared(MediaPlayer mp) {
+                                                                        //adding seek bar in here
+                                                                        int totalTime = MainActivity.player.getDuration();
+                                                                        seekBar.setMax(totalTime);
+                                                                        //seek bar
+                                                                        seekBar.setOnSeekBarChangeListener(
+                                                                                new SeekBar.OnSeekBarChangeListener() {
+                                                                                    @Override
+                                                                                    public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                                                                                        if(fromUser){
+                                                                                            MainActivity.player.seekTo(progress);
+                                                                                            seekBar.setProgress(progress);
+                                                                                        }
+                                                                                    }
+
+                                                                                    @Override
+                                                                                    public void onStartTrackingTouch(SeekBar seekBar) { }
+
+                                                                                    @Override
+                                                                                    public void onStopTrackingTouch(SeekBar seekBar) { }
+                                                                                }
+                                                                        );
+
+                                                                        new Thread(new Runnable() {
+                                                                            @Override
+                                                                            public void run() {
+                                                                                while(MainActivity.player != null) {
+                                                                                    try{
+                                                                                        Message msg = new Message();
+                                                                                        msg.what = MainActivity.player.getCurrentPosition();
+                                                                                        Thread.sleep(1000);
+                                                                                    } catch (InterruptedException e) {}
+                                                                                }
+                                                                            }
+                                                                        }).start();
+                                                                        //end seek bar addition
+                                                                        MainActivity.player.start();
+                                                                        btnPlay.setBackgroundResource(R.drawable.stop);
+                                                                    }
+                                                                });
+                                                                MainActivity.player.prepare();
+                                                            } catch (IOException e) {
+                                                                e.printStackTrace();
+                                                            }
+                                                        }
+                                                    });
+                                                }
+                                            });
                                         }
                                     });
                                 }
@@ -145,17 +225,7 @@ public class MusicPlayer {
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
-
-                        final List<Song> songList = new ArrayList<>();
-                        musicOnDB.getSongs(mDatabaseRef, new MusicOnDB.songNamesCallback() {
-                            @Override
-                            public void onCallback(List<String> songNames) {
-                                for(String name : songNames){
-                                    songList.add(new Song(name, "Unknown"));
-                                }
-                                populateQueue(songList);
-                            }
-                        });
+                        updateQueue(mDatabaseRef);
                     }
                 });
             }
@@ -178,6 +248,7 @@ public class MusicPlayer {
             }
         });
     }
+
     //seek bar helper functions
     @SuppressLint("HandlerLeak")
     private Handler handler = new Handler(){

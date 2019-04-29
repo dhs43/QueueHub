@@ -27,7 +27,6 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
-import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -50,6 +49,7 @@ public class MainActivity extends AppCompatActivity {
 
 
     static MediaPlayer player;
+    static String currentSong = "";
     Button btnPlay;
     ImageView ivCover;
     SeekBar seekBar;

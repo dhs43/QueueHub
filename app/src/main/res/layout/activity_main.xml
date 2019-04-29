@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -7,14 +8,16 @@
     tools:context=".MainActivity">
 
 
-    <com.sothree.slidinguppanel.SlidingUpPanelLayout xmlns:sothree="http://schemas.android.com/apk/res-auto"
+    <com.sothree.slidinguppanel.SlidingUpPanelLayout
+        xmlns:sothree="http://schemas.android.com/apk/res-auto"
         android:id="@+id/sliding_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:gravity="bottom"
         sothree:umanoPanelHeight="114dp"
-        sothree:umanoShadowHeight="4dp"
-        sothree:umanoParallaxOffset="10dp"
+        sothree:umanoFadeColor="@android:color/transparent"
+        sothree:umanoShadowHeight="0dp"
+        sothree:umanoParallaxOffset="210dp"
         sothree:umanoScrollableView="@id/rvSongs">
 
 
@@ -122,7 +125,7 @@
         <android.support.constraint.ConstraintLayout
             android:id="@+id/playerLayout"
             android:layout_width="match_parent"
-            android:layout_height="550dp"
+            android:layout_height="500dp"
             app:layout_constraintTop_toTopOf="parent"
             tools:context=".MainActivity">
 
@@ -130,8 +133,8 @@
                 android:id="@+id/rvSongs"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_marginStart="8dp"
-                android:layout_marginEnd="8dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
                 android:background="@color/offwhite"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
