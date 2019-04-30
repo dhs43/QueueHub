@@ -1,6 +1,7 @@
 package com.example.queuehub;
 
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.util.Log;
 import android.view.View;
@@ -24,10 +25,19 @@ import java.util.List;
 
 class MusicOnDB {
 
+    private StorageReference storageRef;
+    private FirebaseDatabase databaseRef;
+    private String filename;
+
     final private String TAG = "MusicOnDB";
 
+    public MusicOnDB(StorageReference myStorageRef, FirebaseDatabase myDatabaseRef) {
+        storageRef = myStorageRef;
+        databaseRef = myDatabaseRef;
+    }
+
     // Expects a reference to the main Firebase storage and file to upload
-    void uploadMusicFile(final Uri file, final StorageReference storageRef, final FirebaseDatabase databaseRef, final ProgressBar uploadProgressBar, Uri fileUri) {
+    void uploadMusicFile(final Uri file, final ProgressBar uploadProgressBar, Uri fileUri) {
 
         uploadProgressBar.setVisibility(View.VISIBLE);
 
@@ -149,21 +159,37 @@ class MusicOnDB {
     }
 
 
-    void getFileUrl(String filename, StorageReference storageRef, final DatabaseCallback databaseCallback) {
+    void getFileUrl(String thisFilename, final DatabaseCallback databaseCallback) {
 
-        storageRef.child("music").child(filename).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-            @Override
-            public void onSuccess(Uri uri) {
-                String fileURL = uri.toString();
-                databaseCallback.onCallback(fileURL);
-            }
+        filename = thisFilename;
 
-        }).addOnFailureListener(new OnFailureListener() {
+        new getFileUrlAsync().execute(new DatabaseCallback() {
             @Override
-            public void onFailure(@NonNull Exception e) {
-                Log.e(TAG, e.getMessage());
+            public void onCallback(String thisURL) {
+                databaseCallback.onCallback(thisURL);
             }
         });
+    }
+
+    private class getFileUrlAsync extends AsyncTask<DatabaseCallback, Void, Uri> {
+
+        @Override
+        protected Uri doInBackground(final DatabaseCallback... databaseCallbacks) {
+            storageRef.child("music").child(filename).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                @Override
+                public void onSuccess(Uri uri) {
+                    databaseCallbacks[0].onCallback(uri.toString());
+                }
+
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    Log.e(TAG, e.getMessage());
+                }
+            });
+
+            return null;
+        }
     }
 
     public interface DatabaseCallback {

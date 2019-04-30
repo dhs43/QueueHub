@@ -15,6 +15,8 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
@@ -29,6 +31,7 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder>{
     private OnItemClickListener listener;
     private Button btnPlay;
     private SeekBar seekBar;
+    private MusicOnDB musicOnDB;
 
 
     public interface  OnItemClickListener{
@@ -36,11 +39,13 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder>{
     }
 
 
-    public SongAdapter(Context context, List<Song> songs, Button myBtnPlay, SeekBar mySeekBar) {
+    public SongAdapter(Context context, List<Song> songs, Button myBtnPlay, SeekBar mySeekBar,
+                       FirebaseDatabase myDatabaseRef, StorageReference myStorageRef) {
         this.context = context;
         this.songsQueue = songs;
         btnPlay = myBtnPlay;
         seekBar = mySeekBar;
+        musicOnDB = new MusicOnDB(myStorageRef, myDatabaseRef);
         this.listener = listener;
     }
 
@@ -95,84 +100,10 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder>{
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Toast.makeText(context,"Now playing: " + song.getTitle(), Toast.LENGTH_LONG).show();
+
+                    //Toast.makeText(context,"Now playing: " + song.getTitle(), Toast.LENGTH_LONG).show();
                     final String selection = song.getTitle();
-
-
-                    MusicOnDB musicOnDB = new MusicOnDB();
-                    StorageReference mStorageRef = FirebaseStorage.getInstance().getReference();
-
-                    musicOnDB.getFileUrl(selection, mStorageRef, new MusicOnDB.DatabaseCallback() {
-                        @Override
-                        public void onCallback(String thisURL) {
-
-
-                            MainActivity.player.stop();
-                            btnPlay.setBackgroundResource(R.drawable.play);
-
-                            MainActivity.player = new MediaPlayer();
-                            //player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-                            //  @Override
-                            //public void onCompletion(MediaPlayer mp) {
-                            //  btnPlay.setBackgroundResource(R.drawable.play);
-                            //}
-                            //});
-                            try {
-                                Log.d("fetchingFirebase3", "getSongs");
-                                MainActivity.player.setDataSource(thisURL);
-                                MainActivity.player.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
-                                    @Override
-                                    public void onPrepared(MediaPlayer mp) {
-                                        //adding seek bar in here
-                                        int totalTime = MainActivity.player.getDuration();
-                                        seekBar.setMax(totalTime);
-                                        //seek bar
-                                        seekBar.setOnSeekBarChangeListener(
-                                                new SeekBar.OnSeekBarChangeListener() {
-                                                    @Override
-                                                    public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                                                        if(fromUser){
-                                                            MainActivity.player.seekTo(progress);
-                                                            seekBar.setProgress(progress);
-                                                        }
-                                                    }
-
-                                                    @Override
-                                                    public void onStartTrackingTouch(SeekBar seekBar) {
-
-                                                    }
-
-                                                    @Override
-                                                    public void onStopTrackingTouch(SeekBar seekBar) {
-
-                                                    }
-                                                }
-                                        );
-
-                                        new Thread(new Runnable() {
-                                            @Override
-                                            public void run() {
-                                                while(MainActivity.player != null) {
-                                                    try{
-                                                        Message msg = new Message();
-                                                        msg.what = MainActivity.player.getCurrentPosition();
-                                                        //handler.sendMessage(msg);
-                                                        Thread.sleep(1000);
-                                                    } catch (InterruptedException e) {}
-                                                }
-                                            }
-                                        }).start();
-                                        //end seek bar addition
-                                        MainActivity.player.start();
-                                        btnPlay.setBackgroundResource(R.drawable.stop);
-                                    }
-                                });
-                                MainActivity.player.prepare();
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }
-                        }
-                    });
+                    MainActivity.musicPlayer.playFile(selection);
                 }
             });
         }

@@ -50,6 +50,7 @@ public class MainActivity extends AppCompatActivity {
 
     static MediaPlayer player;
     static String currentSong = "";
+    static MusicPlayer musicPlayer;
     Button btnPlay;
     ImageView ivCover;
     SeekBar seekBar;
@@ -58,6 +59,7 @@ public class MainActivity extends AppCompatActivity {
     ProgressBar uploadProgressBar;
     Button btnSkip;
     int totalTime;
+    MusicOnDB musicOnDB;
     static Context context;
 
     //for the queue
@@ -83,7 +85,7 @@ public class MainActivity extends AppCompatActivity {
         //for the queue
         List<Song> songsQueue = new ArrayList<>();
         rvSongs = findViewById(R.id.rvSongs);
-        songsAdapter = new SongAdapter(this, songsQueue, btnPlay, seekBar);
+        songsAdapter = new SongAdapter(this, songsQueue, btnPlay, seekBar, mDatabaseRef, mStorageRef);
         rvSongs.setLayoutManager(new LinearLayoutManager(this));
         rvSongs.setAdapter(songsAdapter);
 
@@ -103,6 +105,8 @@ public class MainActivity extends AppCompatActivity {
         // Register user anonymously with Firebase
         authenticateAnonymously();
 
+        musicOnDB = new MusicOnDB(mStorageRef, mDatabaseRef);
+
         btnSelectFile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -115,9 +119,16 @@ public class MainActivity extends AppCompatActivity {
 
 
         // Instantiate a MusicPlayer
-        MusicPlayer mMusicPlayer = new MusicPlayer(seekBar, btnPlay, remainingTime, elapsedTime, songsAdapter, btnSkip);
-        // This line can be moved to wherever we need to play the song.
-        mMusicPlayer.playFile(mStorageRef,mDatabaseRef);
+        musicPlayer = new MusicPlayer(seekBar, btnPlay, remainingTime, elapsedTime,
+                songsAdapter, btnSkip, mStorageRef, mDatabaseRef, musicOnDB);
+
+        // Play last song
+        musicOnDB.getSongs(mDatabaseRef, new MusicOnDB.songNamesCallback() {
+            @Override
+            public void onCallback(List<String> songNames) {
+                musicPlayer.playFile(songNames.get(songNames.size() - 1));
+            }
+        });
     }
 
     @Override
@@ -127,9 +138,7 @@ public class MainActivity extends AppCompatActivity {
             if (resultCode == RESULT_OK) {
                 if (data != null) {
                     selectedFile = data.getData();
-
-                    MusicOnDB musicOnDB = new MusicOnDB();
-                    musicOnDB.uploadMusicFile(selectedFile, mStorageRef, mDatabaseRef, uploadProgressBar, selectedFile);
+                    musicOnDB.uploadMusicFile(selectedFile, uploadProgressBar, selectedFile);
                 }
             }
         }
