@@ -1,9 +1,11 @@
 package com.example.queuehub;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.os.Message;
 import android.support.annotation.NonNull;
+import android.support.constraint.ConstraintLayout;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -11,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -22,6 +25,8 @@ import com.google.firebase.storage.StorageReference;
 
 import java.io.IOException;
 import java.util.List;
+
+import static com.example.queuehub.MainActivity.currentSong;
 
 
 public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder>{
@@ -47,6 +52,7 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder>{
         seekBar = mySeekBar;
         musicOnDB = new MusicOnDB(myStorageRef, myDatabaseRef);
         this.listener = listener;
+
     }
 
     @Override
@@ -87,6 +93,7 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder>{
         public ImageView ivCoverArt;
         public TextView tvSongTitle;
         public TextView tvArtist;
+        public ConstraintLayout clSong;
 
 
         public ViewHolder(View itemView){
@@ -94,14 +101,30 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder>{
             ivCoverArt = itemView.findViewById(R.id.ivCoverArt);
             tvArtist = itemView.findViewById(R.id.tvArtist);
             tvSongTitle = itemView.findViewById(R.id.tvSongTitle);
+            clSong = itemView.findViewById(R.id.clSong);
         }
 
         public void bind(final Song song, final OnItemClickListener listener){
+
+            String title = song.getTitle();
+            if(title.matches(currentSong))
+            {
+                clSong.setBackgroundColor(Color.GRAY);
+            }
+            else
+            {
+                clSong.setBackgroundColor(939393);
+            }
+
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
 
-                    //Toast.makeText(context,"Now playing: " + song.getTitle(), Toast.LENGTH_LONG).show();
+                    currentSong = song.getTitle();
+                    clSong.setBackgroundColor(Color.GRAY);
+                    notifyDataSetChanged();
+
+                    Toast.makeText(context,"Now playing: " + song.getTitle(), Toast.LENGTH_LONG).show();
                     final String selection = song.getTitle();
                     MainActivity.musicPlayer.playFile(selection);
                 }

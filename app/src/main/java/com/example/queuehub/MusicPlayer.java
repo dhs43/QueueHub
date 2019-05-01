@@ -89,6 +89,7 @@ public class MusicPlayer {
                             }
                         }
                         MainActivity.currentSong = next;
+                        songsAdapter.notifyDataSetChanged();
 
                         // Get URL from fileName
                         musicOnDB.getFileUrl(next, new MusicOnDB.DatabaseCallback() {
