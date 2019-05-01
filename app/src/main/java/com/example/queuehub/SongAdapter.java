@@ -5,6 +5,7 @@ import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.os.Message;
 import android.support.annotation.NonNull;
+import android.support.constraint.ConstraintLayout;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -12,24 +13,30 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
 import java.io.IOException;
 import java.util.List;
 
+import static com.example.queuehub.MainActivity.currentSong;
+
 
 public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder>{
 
     private Context context;
-    private List<Song> songs;
+    private List<Song> songsQueue;
     private OnItemClickListener listener;
     private Button btnPlay;
     private SeekBar seekBar;
+    private MusicOnDB musicOnDB;
 
 
     public interface  OnItemClickListener{
@@ -37,27 +44,30 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder>{
     }
 
 
-    public SongAdapter(Context context, List<Song> songs, Button myBtnPlay, SeekBar mySeekBar) {
+    public SongAdapter(Context context, List<Song> songs, Button myBtnPlay, SeekBar mySeekBar,
+                       FirebaseDatabase myDatabaseRef, StorageReference myStorageRef) {
         this.context = context;
-        this.songs = songs;
+        this.songsQueue = songs;
         btnPlay = myBtnPlay;
         seekBar = mySeekBar;
+        musicOnDB = new MusicOnDB(myStorageRef, myDatabaseRef);
         this.listener = listener;
+
     }
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        Song song = songs.get(position);
+        Song song = songsQueue.get(position);
         holder.tvSongTitle.setText(song.getTitle());
         holder.tvArtist.setText(song.getArtist());
         holder.ivCoverArt.setImageResource(R.drawable.image);
 
-        holder.bind(songs.get(position), listener);
+        holder.bind(songsQueue.get(position), listener);
     }
 
     @Override
     public int getItemCount() {
-        return songs.size();
+        return songsQueue.size();
     }
 
 
@@ -69,12 +79,12 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder>{
     }
 
     public void clear() {
-        songs.clear();
+        songsQueue.clear();
         notifyDataSetChanged();
     }
 
     public void addSongs(List<Song> songList){
-        songs.addAll(songList);
+        songsQueue.addAll(songList);
         notifyDataSetChanged();
     }
 
@@ -83,6 +93,7 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder>{
         public ImageView ivCoverArt;
         public TextView tvSongTitle;
         public TextView tvArtist;
+        public ConstraintLayout clSong;
 
 
         public ViewHolder(View itemView){
@@ -90,94 +101,34 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder>{
             ivCoverArt = itemView.findViewById(R.id.ivCoverArt);
             tvArtist = itemView.findViewById(R.id.tvArtist);
             tvSongTitle = itemView.findViewById(R.id.tvSongTitle);
+            clSong = itemView.findViewById(R.id.clSong);
         }
 
         public void bind(final Song song, final OnItemClickListener listener){
+
+            String title = song.getTitle();
+            if(title.matches(currentSong))
+            {
+                clSong.setBackgroundColor(Color.GRAY);
+            }
+            else
+            {
+                clSong.setBackgroundColor(939393);
+            }
+
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+
+                    currentSong = song.getTitle();
+                    clSong.setBackgroundColor(Color.GRAY);
+                    notifyDataSetChanged();
+
                     Toast.makeText(context,"Now playing: " + song.getTitle(), Toast.LENGTH_LONG).show();
                     final String selection = song.getTitle();
-
-
-                    MusicOnDB musicOnDB = new MusicOnDB();
-                    StorageReference mStorageRef = FirebaseStorage.getInstance().getReference();
-
-                    musicOnDB.getFileUrl(selection, mStorageRef, new MusicOnDB.DatabaseCallback() {
-                        @Override
-                        public void onCallback(String thisURL) {
-
-
-                            MainActivity.player.stop();
-                            btnPlay.setBackgroundResource(R.drawable.play);
-
-                            MainActivity.player = new MediaPlayer();
-                            //player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-                            //  @Override
-                            //public void onCompletion(MediaPlayer mp) {
-                            //  btnPlay.setBackgroundResource(R.drawable.play);
-                            //}
-                            //});
-                            try {
-                                Log.d("fetchingFirebase3", "getSongs");
-                                MainActivity.player.setDataSource(thisURL);
-                                MainActivity.player.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
-                                    @Override
-                                    public void onPrepared(MediaPlayer mp) {
-                                        //adding seek bar in here
-                                        int totalTime = MainActivity.player.getDuration();
-                                        seekBar.setMax(totalTime);
-                                        //seek bar
-                                        seekBar.setOnSeekBarChangeListener(
-                                                new SeekBar.OnSeekBarChangeListener() {
-                                                    @Override
-                                                    public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                                                        if(fromUser){
-                                                            MainActivity.player.seekTo(progress);
-                                                            seekBar.setProgress(progress);
-                                                        }
-                                                    }
-
-                                                    @Override
-                                                    public void onStartTrackingTouch(SeekBar seekBar) {
-
-                                                    }
-
-                                                    @Override
-                                                    public void onStopTrackingTouch(SeekBar seekBar) {
-
-                                                    }
-                                                }
-                                        );
-
-                                        new Thread(new Runnable() {
-                                            @Override
-                                            public void run() {
-                                                while(MainActivity.player != null) {
-                                                    try{
-                                                        Message msg = new Message();
-                                                        msg.what = MainActivity.player.getCurrentPosition();
-                                                        //handler.sendMessage(msg);
-                                                        Thread.sleep(1000);
-                                                    } catch (InterruptedException e) {}
-                                                }
-                                            }
-                                        }).start();
-                                        //end seek bar addition
-                                        MainActivity.player.start();
-                                        seekBar.setBackgroundColor(Color.LTGRAY); // Temporary to show when player is ready
-                                        btnPlay.setBackgroundResource(R.drawable.stop);
-                                    }
-                                });
-                                MainActivity.player.prepare();
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }
-                        }
-                    });
+                    MainActivity.musicPlayer.playFile(selection);
                 }
             });
-
         }
     }
 }
