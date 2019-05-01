@@ -1,5 +1,7 @@
 package com.example.queuehub;
 
+import android.graphics.BitmapFactory;
+import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
@@ -230,4 +232,5 @@ class MusicOnDB {
     public interface songNamesCallback {
         void onCallback(ArrayList<Song> songNames);
     }
+
 }

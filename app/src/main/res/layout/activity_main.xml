@@ -149,6 +149,6 @@
 
         </android.support.constraint.ConstraintLayout>
 
-    </com.sothree.slidinguppanel.SlidingUpPanelLayout>
+</com.sothree.slidinguppanel.SlidingUpPanelLayout>
 
 </android.support.constraint.ConstraintLayout>

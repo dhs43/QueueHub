@@ -193,7 +193,6 @@ public class MusicPlayer {
                                     }
                                 });
                                 MainActivity.player.prepare();
-                                //add current song for skip to work on start
                                 MainActivity.player.start();
                                 btnPlay.setBackgroundResource(R.drawable.stop);
                             } catch (IOException e) {

@@ -3,6 +3,8 @@ package com.example.queuehub;
 import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
+
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
@@ -11,12 +13,15 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.SeekBar;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
@@ -28,6 +33,9 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -67,6 +75,7 @@ public class MainActivity extends AppCompatActivity {
     //for the queue
     SongAdapter songsAdapter;
     RecyclerView rvSongs;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -122,6 +131,7 @@ public class MainActivity extends AppCompatActivity {
 
 
         // Instantiate a MusicPlayer
+
         musicPlayer = new MusicPlayer(seekBar, btnPlay, remainingTime, elapsedTime,
                 songsAdapter, btnSkip, mStorageRef, mDatabaseRef, musicOnDB, context);
 
