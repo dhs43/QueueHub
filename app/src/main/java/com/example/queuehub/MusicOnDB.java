@@ -21,7 +21,6 @@ import com.google.firebase.storage.UploadTask;
 
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.List;
 
 class MusicOnDB {
 
@@ -85,6 +84,9 @@ class MusicOnDB {
                                                         queueRef.child(songTitle).setValue("0");
                                                         Calendar calendar = Calendar.getInstance();
                                                         queueRef.child(songTitle).setValue(calendar.getTimeInMillis());
+                                                        queueRef.child(songTitle).child("title").setValue(songTitle);
+                                                        queueRef.child(songTitle).child("artist").setValue(songArtist);
+                                                        queueRef.child(songTitle).child("image").setValue(albumArtURL[0]);
                                                         uploadProgressBar.setVisibility(View.GONE);
 
                                                         Log.d(TAG, "File uploaded");
@@ -138,6 +140,8 @@ class MusicOnDB {
                                 queueRef.child(songTitle).setValue("0");
                                 Calendar calendar = Calendar.getInstance();
                                 queueRef.child(songTitle).setValue(calendar.getTimeInMillis());
+                                queueRef.child(songTitle).child("title").setValue(songTitle);
+                                queueRef.child(songTitle).child("artist").setValue(songArtist);
                                 uploadProgressBar.setVisibility(View.GONE);
 
                                 Log.d(TAG, "File uploaded");
@@ -204,10 +208,15 @@ class MusicOnDB {
 
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
-                        List<String> songNames = new ArrayList<>();
-                        for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                            String song = snapshot.getKey();
-                            songNames.add(song);
+                        ArrayList<Song> songNames = new ArrayList<>();
+                        for (DataSnapshot songChild : dataSnapshot.getChildren()) {
+                            String title = songChild.child("title").getValue().toString();
+                            String artist = songChild.child("artist").getValue().toString();
+                            String imageURL = songChild.child("image").getValue().toString();
+
+                            Song thisSong = new Song(title, artist, imageURL);
+
+                            songNames.add(thisSong);
                         }
                         songsCallback.onCallback(songNames);
                     }
@@ -219,6 +228,6 @@ class MusicOnDB {
     }
 
     public interface songNamesCallback {
-        void onCallback(List<String> songNames);
+        void onCallback(ArrayList<Song> songNames);
     }
 }

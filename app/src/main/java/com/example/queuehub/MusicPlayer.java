@@ -6,21 +6,12 @@ import android.media.MediaPlayer;
 import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Message;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
-import com.google.firebase.database.ChildEventListener;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
-import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
 import java.io.IOException;
@@ -78,13 +69,13 @@ public class MusicPlayer {
                 MainActivity.player.stop();
                 musicOnDB.getSongs(mDatabaseRef, new MusicOnDB.songNamesCallback() {
                     @Override
-                    public void onCallback(List<String> songNames) {
-                        String next = songNames.get(0);
-                        for(int i = 0; i < songNames.size()-1; i++)
+                    public void onCallback(ArrayList<Song> songList) {
+                        String next = songList.get(0).getTitle();
+                        for(int i = 0; i < songList.size()-1; i++)
                         {
-                            if(songNames.get(i).equals(MainActivity.currentSong))
+                            if(songList.get(i).equals(MainActivity.currentSong))
                             {
-                                next = songNames.get(i+1);
+                                next = songList.get(i+1).getTitle();
                                 break;
                             }
                         }
@@ -240,12 +231,13 @@ public class MusicPlayer {
         @Override
         protected Void doInBackground(FirebaseDatabase... firebaseDatabases) {
             MusicOnDB musicOnDB = new MusicOnDB(mStorageRef, mDatabaseRef);
-            final List<Song> songList = new ArrayList<>();
+            final ArrayList<Song> songList = new ArrayList<>();
             musicOnDB.getSongs(mDatabaseRef, new MusicOnDB.songNamesCallback() {
                 @Override
-                public void onCallback(List<String> songNames) {
-                    for(String name : songNames){
-                        songList.add(new Song(name, "Unknown"));
+                public void onCallback(ArrayList<Song> songNames) {
+                    for(Song thisSong : songNames){
+                        songList.add(new Song(thisSong.getTitle(), thisSong.getArtist(), thisSong.getImageURL()));
+
                     }
                     populateQueue(songList);
                 }
