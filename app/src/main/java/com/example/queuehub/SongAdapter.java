@@ -27,6 +27,7 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.example.queuehub.MainActivity.currentSong;
@@ -35,7 +36,7 @@ import static com.example.queuehub.MainActivity.currentSong;
 public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder>{
 
     private Context context;
-    private List<Song> songsQueue;
+    private ArrayList<Song> songsQueue;
     private OnItemClickListener listener;
     private Button btnPlay;
     private SeekBar seekBar;
@@ -46,7 +47,7 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder>{
     }
 
 
-    public SongAdapter(Context context, List<Song> songs, Button myBtnPlay, SeekBar mySeekBar,
+    public SongAdapter(Context context, ArrayList<Song> songs, Button myBtnPlay, SeekBar mySeekBar,
                        FirebaseDatabase myDatabaseRef, StorageReference myStorageRef) {
         this.context = context;
         this.songsQueue = songs;
@@ -91,6 +92,7 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder>{
 
     public void addSongs(List<Song> songList){
         songsQueue.addAll(songList);
+        MainActivity.songList = songsQueue;
         notifyDataSetChanged();
     }
 
@@ -113,7 +115,7 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder>{
         public void bind(final Song song, final OnItemClickListener listener){
 
             String title = song.getTitle();
-            if(title.matches(currentSong))
+            if(title.matches(currentSong.getTitle()))
             {
                 clSong.setBackgroundColor(Color.GRAY);
             }
@@ -126,7 +128,7 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder>{
                 @Override
                 public void onClick(View v) {
 
-                    currentSong = song.getTitle();
+                    currentSong = song;
                     clSong.setBackgroundColor(Color.GRAY);
                     notifyDataSetChanged();
 

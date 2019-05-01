@@ -50,7 +50,8 @@ public class MainActivity extends AppCompatActivity {
 
 
     static MediaPlayer player;
-    static String currentSong = "";
+    static Song currentSong = new Song("title", "artist", "url");
+    static ArrayList<Song> songList;
     static MusicPlayer musicPlayer;
     Button btnPlay;
     static ImageView ivCover;
@@ -81,10 +82,11 @@ public class MainActivity extends AppCompatActivity {
         btnSkip = findViewById(R.id.btnSkip);
         uploadProgressBar = findViewById(R.id.determinateBar);
         player = new MediaPlayer();
+        songList = new ArrayList<>();
         context = this;
 
         //for the queue
-        List<Song> songsQueue = new ArrayList<>();
+        ArrayList<Song> songsQueue = new ArrayList<>();
         rvSongs = findViewById(R.id.rvSongs);
         songsAdapter = new SongAdapter(this, songsQueue, btnPlay, seekBar, mDatabaseRef, mStorageRef);
         rvSongs.setLayoutManager(new LinearLayoutManager(this));

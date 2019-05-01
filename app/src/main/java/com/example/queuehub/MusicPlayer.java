@@ -77,13 +77,13 @@ public class MusicPlayer {
                         String next = songList.get(0).getTitle();
                         for(int i = 0; i < songList.size()-1; i++)
                         {
-                            if(songList.get(i).equals(MainActivity.currentSong))
+                            if(songList.get(i).equals(MainActivity.currentSong.getTitle()))
                             {
                                 next = songList.get(i+1).getTitle();
                                 break;
                             }
                         }
-                        MainActivity.currentSong = next;
+                        MainActivity.currentSong.setTitle(next);
                         songsAdapter.notifyDataSetChanged();
 
                         // Get URL from fileName
@@ -161,10 +161,20 @@ public class MusicPlayer {
     private class playFileAsync extends AsyncTask<String, Void, Void> {
 
         @Override
-        protected Void doInBackground(String... filename) {
+        protected Void doInBackground(final String... filename) {
             musicOnDB.getFileUrl(filename[0], new MusicOnDB.DatabaseCallback() {
                         @Override
                         public void onCallback(String fileURL) {
+                            for (Song song : MainActivity.songList) {
+                                if (song.getTitle().equals(filename[0])) {
+                                    MainActivity.currentSong = song;
+                                }
+                            }
+
+                            Glide.with(context)
+                                    .load(MainActivity.currentSong.getImageURL())
+                                    .into(MainActivity.ivCover);
+
                             // Release memory from previously-playing player
                             MainActivity.player.release();
                             MainActivity.player = new MediaPlayer();
@@ -183,6 +193,7 @@ public class MusicPlayer {
                                     }
                                 });
                                 MainActivity.player.prepare();
+                                //add current song for skip to work on start
                                 MainActivity.player.start();
                                 btnPlay.setBackgroundResource(R.drawable.stop);
                             } catch (IOException e) {
