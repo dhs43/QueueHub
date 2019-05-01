@@ -19,6 +19,7 @@ import android.widget.ProgressBar;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
@@ -52,7 +53,7 @@ public class MainActivity extends AppCompatActivity {
     static String currentSong = "";
     static MusicPlayer musicPlayer;
     Button btnPlay;
-    ImageView ivCover;
+    static ImageView ivCover;
     SeekBar seekBar;
     TextView elapsedTime;
     TextView remainingTime;
@@ -120,7 +121,7 @@ public class MainActivity extends AppCompatActivity {
 
         // Instantiate a MusicPlayer
         musicPlayer = new MusicPlayer(seekBar, btnPlay, remainingTime, elapsedTime,
-                songsAdapter, btnSkip, mStorageRef, mDatabaseRef, musicOnDB);
+                songsAdapter, btnSkip, mStorageRef, mDatabaseRef, musicOnDB, context);
 
         // Play last song
         musicOnDB.getSongs(mDatabaseRef, new MusicOnDB.songNamesCallback() {

@@ -18,6 +18,9 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.annotation.GlideModule;
+import com.bumptech.glide.module.AppGlideModule;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
@@ -38,7 +41,6 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder>{
     private SeekBar seekBar;
     private MusicOnDB musicOnDB;
 
-
     public interface  OnItemClickListener{
         void onItemClick(Song song);
     }
@@ -52,7 +54,6 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder>{
         seekBar = mySeekBar;
         musicOnDB = new MusicOnDB(myStorageRef, myDatabaseRef);
         this.listener = listener;
-
     }
 
     @Override
@@ -60,8 +61,13 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder>{
         Song song = songsQueue.get(position);
         holder.tvSongTitle.setText(song.getTitle());
         holder.tvArtist.setText(song.getArtist());
-        holder.ivCoverArt.setImageResource(R.drawable.image);
-
+        //holder.ivCoverArt.setImageResource(R.drawable.image);
+        Glide.with(context)
+                    .load(song.getImageURL())
+                    .into(holder.ivCoverArt);
+//        Glide.with(context)
+//                .load(song.getImageURL())
+//                .into(MainActivity.ivCover);
         holder.bind(songsQueue.get(position), listener);
     }
 

@@ -1,6 +1,7 @@
 package com.example.queuehub;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.os.AsyncTask;
@@ -11,6 +12,7 @@ import android.widget.Button;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.StorageReference;
 
@@ -30,11 +32,12 @@ public class MusicPlayer {
     private FirebaseDatabase mDatabaseRef;
     private MusicOnDB musicOnDB;
     final private String TAG = "MusicPlayer";
+    private Context context;
 
 
     public MusicPlayer(SeekBar mySeekBar, Button myButtonPlay, TextView myRemainingTime,
                        TextView myElapsedTime, SongAdapter mySongAdapter, Button myBtnSkip,
-                        StorageReference myStorageRef, FirebaseDatabase myDatabaseRef, MusicOnDB myMusicOnDB) {
+                        StorageReference myStorageRef, FirebaseDatabase myDatabaseRef, MusicOnDB myMusicOnDB, Context myContext) {
         totalTime = 0;
         seekBar = mySeekBar;
         btnPlay = myButtonPlay;
@@ -44,6 +47,7 @@ public class MusicPlayer {
         mStorageRef = myStorageRef;
         mDatabaseRef = myDatabaseRef;
         musicOnDB = myMusicOnDB;
+        context = myContext;
 
 
 
