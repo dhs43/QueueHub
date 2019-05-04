@@ -32,7 +32,6 @@ import java.util.List;
 
 import static com.example.queuehub.MainActivity.currentSong;
 
-
 public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder>{
 
     private Context context;
@@ -104,6 +103,7 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder>{
         public ConstraintLayout clSong;
 
 
+
         public ViewHolder(View itemView){
             super(itemView);
             ivCoverArt = itemView.findViewById(R.id.ivCoverArt);
@@ -112,8 +112,10 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder>{
             clSong = itemView.findViewById(R.id.clSong);
         }
 
-        public void bind(final Song song, final OnItemClickListener listener){
 
+
+
+        public void bind(final Song song, final OnItemClickListener listener){
             String title = song.getTitle();
             if(title.matches(currentSong.getTitle()))
             {
