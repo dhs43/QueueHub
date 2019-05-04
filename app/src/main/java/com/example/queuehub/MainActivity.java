@@ -60,7 +60,7 @@ public class MainActivity extends AppCompatActivity {
     static String sessionID;
     static Boolean isAHost;
     static MediaPlayer player;
-    static Song currentSong = new Song("title", "artist", "url");
+    static Song currentSong = new Song("title", "artist", "url", 0L,0);
     static ArrayList<Song> songList;
     static MusicPlayer musicPlayer;
     Button btnPlay;

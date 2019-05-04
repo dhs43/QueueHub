@@ -8,6 +8,7 @@ import android.support.annotation.NonNull;
 import android.support.constraint.ConstraintLayout;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,6 +29,8 @@ import com.google.firebase.storage.StorageReference;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import static com.example.queuehub.MainActivity.currentSong;
@@ -89,8 +92,8 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder>{
         notifyDataSetChanged();
     }
 
-    public void addSongs(List<Song> songList){
-        songsQueue.addAll(songList);
+    public void addSongs(ArrayList<Song> songList){
+        songsQueue.addAll(sortByTimestamp(songList));
         MainActivity.songList = songsQueue;
         notifyDataSetChanged();
     }
@@ -140,5 +143,35 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder>{
                 }
             });
         }
+    }
+
+    public ArrayList<Song> sortByTimestamp(List<Song> unsorted){
+        if (unsorted.size() < 1) {
+            return null;
+        }
+        ArrayList<Song> sorted = new ArrayList<>();
+        ArrayList<Pair<Long, Song>> songPairs = new ArrayList<>();
+        for (Song song : unsorted) {
+            songPairs.add(new Pair<>(song.getTimestamp(), song));
+        }
+
+        Collections.sort(songPairs, new Comparator<Pair<Long, Song>>() {
+            @Override
+            public int compare(Pair<Long, Song> song1, Pair<Long, Song> song2) {
+                if (song1.first < song2.first) {
+                    return -1;
+                }else if (song1.first.equals(song2.first)) {
+                    return 0;
+                }else{
+                    return 1;
+                }
+            }
+        });
+
+        for (Pair pair : songPairs) {
+            sorted.add((Song) pair.second);
+        }
+
+        return sorted;
     }
 }
