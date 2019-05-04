@@ -167,7 +167,7 @@ class MusicOnDB {
 
         filename = thisFilename;
 
-        new getFileUrlAsync().execute(new DatabaseCallback() {
+        new getFileUrlAsync().execute(  new DatabaseCallback() {
             @Override
             public void onCallback(String thisURL) {
                 databaseCallback.onCallback(thisURL);

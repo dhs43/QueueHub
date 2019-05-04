@@ -48,7 +48,9 @@ public class MainActivity extends AppCompatActivity {
     // Reference to Firebase Storage
     private StorageReference mStorageRef;
 
-
+    static Boolean isHost = false;
+    static String sessionID;
+    static Boolean isAHost;
     static MediaPlayer player;
     static Song currentSong = new Song("title", "artist", "url");
     static ArrayList<Song> songList;
