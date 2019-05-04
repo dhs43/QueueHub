@@ -83,10 +83,11 @@ class MusicOnDB {
                                                         Log.d(TAG, songTitle);
                                                         queueRef.child(songTitle).setValue("0");
                                                         Calendar calendar = Calendar.getInstance();
-                                                        queueRef.child(songTitle).setValue(calendar.getTimeInMillis());
                                                         queueRef.child(songTitle).child("title").setValue(songTitle);
                                                         queueRef.child(songTitle).child("artist").setValue(songArtist);
                                                         queueRef.child(songTitle).child("image").setValue(albumArtURL[0]);
+                                                        queueRef.child(songTitle).child("timestamp").setValue(calendar.getTimeInMillis());
+                                                        queueRef.child(songTitle).child("vote").setValue("0");
                                                         uploadProgressBar.setVisibility(View.GONE);
 
                                                         Log.d(TAG, "File uploaded");
@@ -139,9 +140,10 @@ class MusicOnDB {
                                 Log.d(TAG, songTitle);
                                 queueRef.child(songTitle).setValue("0");
                                 Calendar calendar = Calendar.getInstance();
-                                queueRef.child(songTitle).setValue(calendar.getTimeInMillis());
                                 queueRef.child(songTitle).child("title").setValue(songTitle);
                                 queueRef.child(songTitle).child("artist").setValue(songArtist);
+                                queueRef.child(songTitle).child("timestamp").setValue(calendar.getTimeInMillis());
+                                queueRef.child(songTitle).child("vote").setValue("0");
                                 uploadProgressBar.setVisibility(View.GONE);
 
                                 Log.d(TAG, "File uploaded");
@@ -202,8 +204,7 @@ class MusicOnDB {
 
     // To get the names of the songs in the queue
     public void getSongs(FirebaseDatabase database, final songNamesCallback songsCallback) {
-        Log.d("fetchingFirebase0", "getSongs");
-        database.getInstance().getReference().child("queue")
+        database.getReference().child("queue")
                 .addListenerForSingleValueEvent(new ValueEventListener() {
 
                     @Override
@@ -213,8 +214,10 @@ class MusicOnDB {
                             String title = songChild.child("title").getValue().toString();
                             String artist = songChild.child("artist").getValue().toString();
                             String imageURL = songChild.child("image").getValue().toString();
+                            Long timestamp = Long.valueOf(songChild.child("timestamp").getValue().toString());
+                            Integer vote = Integer.valueOf(songChild.child("vote").getValue().toString());
 
-                            Song thisSong = new Song(title, artist, imageURL);
+                            Song thisSong = new Song(title, artist, imageURL, timestamp, vote);
 
                             songNames.add(thisSong);
                         }

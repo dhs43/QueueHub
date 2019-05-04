@@ -251,7 +251,9 @@ public class MusicPlayer {
                 @Override
                 public void onCallback(ArrayList<Song> songNames) {
                     for(Song thisSong : songNames){
-                        songList.add(new Song(thisSong.getTitle(), thisSong.getArtist(), thisSong.getImageURL()));
+                        Song tempSong = new Song(thisSong.getTitle(), thisSong.getArtist(),
+                                thisSong.getImageURL(), thisSong.getTimestamp(), thisSong.getVote());
+                        songList.add(tempSong);
 
                     }
                     populateQueue(songList);
@@ -262,8 +264,8 @@ public class MusicPlayer {
         }
     }
 
-    private void populateQueue(List<Song> songs) {
-        List<Song> toAdd = new ArrayList<>();
+    private void populateQueue(ArrayList<Song> songs) {
+        ArrayList<Song> toAdd = new ArrayList<>();
         for (int i = 0; i < songs.size(); i++) {
             toAdd.add(songs.get(i));
         }
