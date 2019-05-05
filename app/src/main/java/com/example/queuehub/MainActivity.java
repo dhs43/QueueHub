@@ -25,6 +25,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
@@ -58,7 +59,7 @@ public class MainActivity extends AppCompatActivity {
 
     static Boolean isHost = false;
     static String sessionID;
-    static Boolean isAHost;
+    static Boolean isSession;
     static MediaPlayer player;
     static Song currentSong = new Song("title", "artist", "url", 0L,0);
     static ArrayList<Song> songList;

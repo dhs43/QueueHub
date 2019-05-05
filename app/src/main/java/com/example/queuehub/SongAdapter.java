@@ -22,6 +22,7 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.annotation.GlideModule;
 import com.bumptech.glide.module.AppGlideModule;
+import com.bumptech.glide.request.RequestOptions;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
@@ -43,6 +44,7 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder>{
     private Button btnPlay;
     private SeekBar seekBar;
     private MusicOnDB musicOnDB;
+    private Boolean firstJoined = true;
 
     public interface  OnItemClickListener{
         void onItemClick(Song song);
@@ -66,8 +68,9 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder>{
         holder.tvArtist.setText(song.getArtist());
         //holder.ivCoverArt.setImageResource(R.drawable.image);
         Glide.with(context)
-                    .load(song.getImageURL())
-                    .into(holder.ivCoverArt);
+                .load(song.getImageURL())
+                .apply(new RequestOptions().placeholder(R.drawable.image))
+                .into(holder.ivCoverArt);
 //        Glide.with(context)
 //                .load(song.getImageURL())
 //                .into(MainActivity.ivCover);
@@ -170,6 +173,16 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder>{
 
         for (Pair pair : songPairs) {
             sorted.add((Song) pair.second);
+        }
+
+        currentSong = sorted.get(0);
+
+        if (firstJoined) {
+            firstJoined = false;
+            Glide.with(context)
+                    .load(MainActivity.currentSong.getImageURL())
+                    .apply(new RequestOptions().placeholder(R.drawable.image))
+                    .into(MainActivity.ivCover);
         }
 
         return sorted;

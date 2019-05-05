@@ -74,12 +74,12 @@ class MusicOnDB {
                                             .build();
 
                                     StorageReference musicRef;
-                                    musicRef = storageRef.child("music/" + songTitle);
+                                    musicRef = storageRef.child(MainActivity.sessionID + "/" + songTitle);
                                     musicRef.putFile(file, metadata)
                                             .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                                                 @Override
                                                 public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                                                    DatabaseReference queueRef = databaseRef.getReference("queue");
+                                                    DatabaseReference queueRef = databaseRef.getReference(MainActivity.sessionID);
 
                                                     if (songTitle != null) {
                                                         Log.d(TAG, songTitle);
@@ -131,12 +131,12 @@ class MusicOnDB {
                     .build();
 
             StorageReference musicRef;
-            musicRef = storageRef.child("music/" + songTitle);
+            musicRef = storageRef.child(MainActivity.sessionID + "/" + songTitle);
             musicRef.putFile(file, metadata)
                     .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                         @Override
                         public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                            DatabaseReference queueRef = databaseRef.getReference("queue");
+                            DatabaseReference queueRef = databaseRef.getReference(MainActivity.sessionID);
 
                             if (songTitle != null) {
                                 Log.d(TAG, songTitle);
@@ -183,7 +183,7 @@ class MusicOnDB {
 
         @Override
         protected Uri doInBackground(final DatabaseCallback... databaseCallbacks) {
-            storageRef.child("music").child(filename).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+            storageRef.child(MainActivity.sessionID).child(filename).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                 @Override
                 public void onSuccess(Uri uri) {
                     databaseCallbacks[0].onCallback(uri.toString());
@@ -206,7 +206,7 @@ class MusicOnDB {
 
     // To get the names of the songs in the queue
     public void getSongs(FirebaseDatabase database, final songNamesCallback songsCallback) {
-        database.getReference().child("queue")
+        database.getReference().child(MainActivity.sessionID)
                 .addListenerForSingleValueEvent(new ValueEventListener() {
 
                     @Override

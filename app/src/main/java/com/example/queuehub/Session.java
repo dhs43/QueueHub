@@ -1,7 +1,11 @@
 package com.example.queuehub;
 
+import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.NonNull;
+import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
+import android.widget.Toast;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -10,7 +14,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 
-public class Session {
+public class Session extends AppCompatActivity {
 
     private FirebaseDatabase database;
 
@@ -24,12 +28,13 @@ public class Session {
     {
         int posID = (int)(Math.random()*9000)+1000;
         final String stringID = Integer.toString(posID);
-        database.getInstance().getReference().child("queue")
+        database.getInstance().getReference()
                 .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                         if(dataSnapshot.hasChild(stringID))
                         {
+                            Log.d("henlo", "found");
                             randomNum(new randomNumCallback() {
                                 @Override
                                 public void onCallback(String ID) {
@@ -53,19 +58,19 @@ public class Session {
     public void sessionExists(String ID, final sessionExistsCallback sessionExistsCallaback)
     {
         final String stringID = ID;
-        database.getInstance().getReference().child("queue")
+        database.getInstance().getReference()
                 .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                         if(dataSnapshot.hasChild(stringID))
                         {
                             //MainActivity.isAHost = true;
-                            sessionExistsCallaback.onCallback(true);
+                            sessionExistsCallaback.onCallback(true, stringID);
                         }
                         else
                         {
                             //MainActivity.isAHost = false;
-                            sessionExistsCallaback.onCallback(false);
+                            sessionExistsCallaback.onCallback(false, stringID);
                         }
                     }
 
@@ -77,17 +82,7 @@ public class Session {
     }
 
     public interface sessionExistsCallback {
-        void onCallback(Boolean yee);
-    }
-
-    public void joinSession(String ID)
-    {
-        this.sessionExists(ID, new sessionExistsCallback() {
-            @Override
-            public void onCallback(Boolean yee) {
-               MainActivity.isAHost = yee;
-            }
-        });
+        void onCallback(Boolean yee, String ID);
     }
 
 

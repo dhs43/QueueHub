@@ -13,6 +13,7 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.StorageReference;
 
@@ -173,6 +174,7 @@ public class MusicPlayer {
 
                             Glide.with(context)
                                     .load(MainActivity.currentSong.getImageURL())
+                                    .apply(new RequestOptions().placeholder(R.drawable.image))
                                     .into(MainActivity.ivCover);
 
                             // Release memory from previously-playing player
