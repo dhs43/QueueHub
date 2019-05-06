@@ -142,7 +142,11 @@ public class MainActivity extends AppCompatActivity {
         musicOnDB.getSongs(mDatabaseRef, new MusicOnDB.songNamesCallback() {
             @Override
             public void onCallback(ArrayList<Song> songNames) {
-                musicPlayer.playFile(songNames.get(songNames.size() - 1).getTitle());
+                if (songNames.size() > 0) {
+                    musicPlayer.playFile(songNames.get(songNames.size() - 1).getTitle());
+                }else{
+                    return;
+                }
             }
         });
     }

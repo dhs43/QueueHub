@@ -43,10 +43,14 @@ public class SplashActivity extends AppCompatActivity {
 
                 mDatabaseRef = FirebaseDatabase.getInstance();
                 Session mySession = new Session(mDatabaseRef);
-                mySession.createSession();
-
-                Intent i = new Intent(getApplicationContext(), MainActivity.class);
-                startActivity(i);
+                mySession.createSession(new Session.createSessionCallback() {
+                    @Override
+                    public void onCallback(String ID) {
+                        MainActivity.sessionID = ID;
+                        Intent i = new Intent(getApplicationContext(), MainActivity.class);
+                        startActivity(i);
+                    }
+                });
             }
         });
 
@@ -71,15 +75,7 @@ public class SplashActivity extends AppCompatActivity {
                         }
                     }
                 });
-
-
-                //mDatabaseRef = FirebaseDatabase.getInstance();
-                //mySession.joinSession(theString, context);
-
-                //Boolean mybool = MainActivity.isSession;
             }
         });
-
     }
-
 }

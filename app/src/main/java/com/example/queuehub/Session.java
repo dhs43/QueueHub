@@ -86,19 +86,22 @@ public class Session extends AppCompatActivity {
     }
 
 
-    public void createSession()
+    public void createSession(final createSessionCallback createSessionCallback)
     {
         //get working sessionID
         this.randomNum(new randomNumCallback() {
             @Override
             public void onCallback(String ID) {
                 //set code to sessionID
-                MainActivity.sessionID = ID;
+                createSessionCallback.onCallback(ID);
+                //isHost = T
+                MainActivity.isHost = true;
             }
         });
+    }
 
-        //isHost = T
-        MainActivity.isHost = true;
+    public interface createSessionCallback{
+        void onCallback(String ID);
     }
 
     public interface randomNumCallback {
