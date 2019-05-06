@@ -128,10 +128,6 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder>{
             {
                 clSong.setBackgroundColor(Color.GRAY);
             }
-            else
-            {
-                clSong.setBackgroundColor(939393);
-            }
 
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override

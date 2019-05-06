@@ -4,6 +4,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:background="@color/darkSong"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     tools:context=".MainActivity">
@@ -25,6 +26,7 @@
         android:id="@+id/tvSongTitle"
         app:layout_constraintStart_toEndOf="@id/ivCoverArt"
         app:layout_constraintTop_toTopOf="parent"
+        android:textColor="@color/colorAccent"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="22dp"
@@ -34,6 +36,7 @@
         android:id="@+id/tvArtist"
         app:layout_constraintStart_toEndOf="@id/ivCoverArt"
         app:layout_constraintTop_toBottomOf="@id/tvSongTitle"
+        android:textColor="@color/colorAccent"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
