@@ -55,7 +55,7 @@ class MusicOnDB {
         // Upload album art to Firebase
         if (songBitMap != null) {
             final StorageReference albumArtRef;
-            albumArtRef = storageRef.child("album_art/" + songTitle);
+            albumArtRef = storageRef.child("album_art/" + MainActivity.sessionID + "/" + songTitle);
             albumArtRef.putBytes(songBitMap)
                     .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                         @Override
@@ -215,9 +215,12 @@ class MusicOnDB {
                         for (DataSnapshot songChild : dataSnapshot.getChildren()) {
                             String title = songChild.child("title").getValue().toString();
                             String artist = songChild.child("artist").getValue().toString();
-                            String imageURL = songChild.child("image").getValue().toString();
                             Long timestamp = Long.valueOf(songChild.child("timestamp").getValue().toString());
                             Integer vote = Integer.valueOf(songChild.child("vote").getValue().toString());
+                            String imageURL = null;
+                            if (songChild.hasChild("image")){
+                                imageURL = songChild.child("image").getValue().toString();
+                            }
 
                             Song thisSong = new Song(title, artist, imageURL, timestamp, vote);
 

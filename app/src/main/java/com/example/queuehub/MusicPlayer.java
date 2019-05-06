@@ -172,10 +172,14 @@ public class MusicPlayer {
                                 }
                             }
 
-                            Glide.with(context)
-                                    .load(MainActivity.currentSong.getImageURL())
-                                    .apply(new RequestOptions().placeholder(R.drawable.image))
-                                    .into(MainActivity.ivCover);
+                            if (MainActivity.currentSong.getImageURL() != null) {
+                                Glide.with(context)
+                                        .load(MainActivity.currentSong.getImageURL())
+                                        .apply(new RequestOptions().placeholder(R.drawable.image))
+                                        .into(MainActivity.ivCover);
+                            }else{
+                                MainActivity.ivCover.setImageResource(R.drawable.image);
+                            }
 
                             // Release memory from previously-playing player
                             MainActivity.player.release();

@@ -67,13 +67,14 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder>{
         holder.tvSongTitle.setText(song.getTitle());
         holder.tvArtist.setText(song.getArtist());
         //holder.ivCoverArt.setImageResource(R.drawable.image);
-        Glide.with(context)
-                .load(song.getImageURL())
-                .apply(new RequestOptions().placeholder(R.drawable.image))
-                .into(holder.ivCoverArt);
-//        Glide.with(context)
-//                .load(song.getImageURL())
-//                .into(MainActivity.ivCover);
+        if (song.getImageURL() != null) {
+            Glide.with(context)
+                    .load(song.getImageURL())
+                    .apply(new RequestOptions().placeholder(R.drawable.image))
+                    .into(holder.ivCoverArt);
+        }else{
+            holder.ivCoverArt.setImageResource(R.drawable.image);
+        }
         holder.bind(songsQueue.get(position), listener);
     }
 
