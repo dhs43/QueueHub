@@ -26,6 +26,7 @@ public class MusicPlayer {
     private int totalTime;
     private SeekBar seekBar;
     private Button btnPlay;
+    private Button btnToggle;
     private TextView remainingTime;
     private TextView elapsedTime;
     private SongAdapter songsAdapter;
@@ -36,7 +37,7 @@ public class MusicPlayer {
     private Context context;
 
 
-    public MusicPlayer(SeekBar mySeekBar, Button myButtonPlay, TextView myRemainingTime,
+    public MusicPlayer(SeekBar mySeekBar, Button myButtonPlay, Button myButtonToggle, TextView myRemainingTime,
                        TextView myElapsedTime, SongAdapter mySongAdapter, Button myBtnSkip,
                         StorageReference myStorageRef, FirebaseDatabase myDatabaseRef, MusicOnDB myMusicOnDB, Context myContext) {
         totalTime = 0;
@@ -49,8 +50,19 @@ public class MusicPlayer {
         mDatabaseRef = myDatabaseRef;
         musicOnDB = myMusicOnDB;
         context = myContext;
+        btnToggle = myButtonToggle;
 
-
+        btnToggle.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                if(MainActivity.isHost == true){
+                    MainActivity.isHost = false;
+                }
+                else{
+                    MainActivity.isHost = true;
+                }
+            }
+        });
 
         btnPlay.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -103,7 +115,9 @@ public class MusicPlayer {
     }
 
     public void playFile(String filename) {
-        new playFileAsync().execute(filename);
+        if(MainActivity.isHost == true) {
+            new playFileAsync().execute(filename);
+        }
     }
 
     private class playFileAsync extends AsyncTask<String, Void, Void> {
