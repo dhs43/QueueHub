@@ -176,7 +176,9 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder>{
             sorted.add((Song) pair.second);
         }
 
-        currentSong = sorted.get(0);
+        if (currentSong.getTitle().equals("title")) {
+            currentSong = sorted.get(0);
+        }
 
         if (firstJoined) {
             firstJoined = false;

@@ -82,7 +82,9 @@
             android:layout_height="wrap_content"
             android:backgroundTint="@color/offwhite"
             android:hint="@string/enter_session_id"
-            android:textColor="@color/offwhite" />
+            android:inputType="number"
+            android:maxLength="4"
+            android:textColor="@android:color/white" />
     </android.support.design.widget.TextInputLayout>
 
     <TextView

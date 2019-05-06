@@ -143,7 +143,8 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onCallback(ArrayList<Song> songNames) {
                 if (songNames.size() > 0) {
-                    musicPlayer.playFile(songNames.get(songNames.size() - 1).getTitle());
+                    songNames = songsAdapter.sortByTimestamp(songNames);
+                    musicPlayer.playFile(songNames.get(0).getTitle());
                 }else{
                     return;
                 }
