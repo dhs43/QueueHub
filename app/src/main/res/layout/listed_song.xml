@@ -5,6 +5,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
+    android:background="@color/darkSongBack"
     android:layout_height="wrap_content"
     tools:context=".MainActivity">
 
@@ -27,6 +28,7 @@
         app:layout_constraintTop_toTopOf="parent"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:textColor="@color/colorAccent"
         android:layout_marginTop="22dp"
         android:text="@string/song_name" />
 
@@ -37,6 +39,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
+        android:textColor="@color/colorAccent"
         android:text="@string/artist_name" />
 
 </android.support.constraint.ConstraintLayout>
