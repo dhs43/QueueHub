@@ -71,6 +71,7 @@ public class MainActivity extends AppCompatActivity {
     TextView remainingTime;
     ProgressBar uploadProgressBar;
     Button btnSkip;
+    Button btnToggle;
     int totalTime;
     MusicOnDB musicOnDB;
     static Context context;
@@ -89,6 +90,7 @@ public class MainActivity extends AppCompatActivity {
         ivCover = findViewById(R.id.ivCover);
         seekBar = findViewById(R.id.seekBar);
         btnPlay = findViewById(R.id.btnPlay);
+        btnToggle = findViewById(R.id.btnToggle);
         elapsedTime = findViewById(R.id.elapsedTime);
         remainingTime = findViewById(R.id.remainingTime);
         btnSkip = findViewById(R.id.btnSkip);
@@ -135,14 +137,19 @@ public class MainActivity extends AppCompatActivity {
 
         // Instantiate a MusicPlayer
 
-        musicPlayer = new MusicPlayer(seekBar, btnPlay, remainingTime, elapsedTime,
+        musicPlayer = new MusicPlayer(seekBar, btnPlay, btnToggle, remainingTime, elapsedTime,
                 songsAdapter, btnSkip, mStorageRef, mDatabaseRef, musicOnDB, context);
 
         // Play last song
         musicOnDB.getSongs(mDatabaseRef, new MusicOnDB.songNamesCallback() {
             @Override
             public void onCallback(ArrayList<Song> songNames) {
-                musicPlayer.playFile(songNames.get(songNames.size() - 1).getTitle());
+                if (songNames.size() > 0) {
+                    songNames = songsAdapter.sortByTimestamp(songNames);
+                    musicPlayer.playFile(songNames.get(0).getTitle());
+                }else{
+                    return;
+                }
             }
         });
     }

@@ -67,13 +67,14 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder>{
         holder.tvSongTitle.setText(song.getTitle());
         holder.tvArtist.setText(song.getArtist());
         //holder.ivCoverArt.setImageResource(R.drawable.image);
-        Glide.with(context)
-                .load(song.getImageURL())
-                .apply(new RequestOptions().placeholder(R.drawable.image))
-                .into(holder.ivCoverArt);
-//        Glide.with(context)
-//                .load(song.getImageURL())
-//                .into(MainActivity.ivCover);
+        if (! song.getImageURL().equals("none")) {
+            Glide.with(context)
+                    .load(song.getImageURL())
+                    .apply(new RequestOptions().placeholder(R.drawable.image))
+                    .into(holder.ivCoverArt);
+        }else{
+            holder.ivCoverArt.setImageResource(R.drawable.image);
+        }
         holder.bind(songsQueue.get(position), listener);
     }
 
@@ -175,14 +176,18 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder>{
             sorted.add((Song) pair.second);
         }
 
-        currentSong = sorted.get(0);
+        if (currentSong.getTitle().equals("title")) {
+            currentSong = sorted.get(0);
+        }
 
         if (firstJoined) {
             firstJoined = false;
-            Glide.with(context)
-                    .load(MainActivity.currentSong.getImageURL())
-                    .apply(new RequestOptions().placeholder(R.drawable.image))
-                    .into(MainActivity.ivCover);
+            if (! currentSong.getImageURL().equals("none")) {
+                Glide.with(context)
+                        .load(MainActivity.currentSong.getImageURL())
+                        .apply(new RequestOptions().placeholder(R.drawable.image))
+                        .into(MainActivity.ivCover);
+            }
         }
 
         return sorted;

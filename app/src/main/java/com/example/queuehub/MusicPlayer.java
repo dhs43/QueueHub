@@ -26,6 +26,7 @@ public class MusicPlayer {
     private int totalTime;
     private SeekBar seekBar;
     private Button btnPlay;
+    private Button btnToggle;
     private TextView remainingTime;
     private TextView elapsedTime;
     private SongAdapter songsAdapter;
@@ -36,7 +37,7 @@ public class MusicPlayer {
     private Context context;
 
 
-    public MusicPlayer(SeekBar mySeekBar, Button myButtonPlay, TextView myRemainingTime,
+    public MusicPlayer(SeekBar mySeekBar, Button myButtonPlay, Button myButtonToggle, TextView myRemainingTime,
                        TextView myElapsedTime, SongAdapter mySongAdapter, Button myBtnSkip,
                         StorageReference myStorageRef, FirebaseDatabase myDatabaseRef, MusicOnDB myMusicOnDB, Context myContext) {
         totalTime = 0;
@@ -49,8 +50,19 @@ public class MusicPlayer {
         mDatabaseRef = myDatabaseRef;
         musicOnDB = myMusicOnDB;
         context = myContext;
+        btnToggle = myButtonToggle;
 
-
+        btnToggle.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                if(MainActivity.isHost == true){
+                    MainActivity.isHost = false;
+                }
+                else{
+                    MainActivity.isHost = true;
+                }
+            }
+        });
 
         btnPlay.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -71,92 +83,41 @@ public class MusicPlayer {
         myBtnSkip.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
-                MainActivity.player.stop();
-                musicOnDB.getSongs(mDatabaseRef, new MusicOnDB.songNamesCallback() {
-                    @Override
-                    public void onCallback(ArrayList<Song> songList) {
-                        String next = songList.get(0).getTitle();
-                        for(int i = 0; i < songList.size()-1; i++)
-                        {
-                            if(songList.get(i).equals(MainActivity.currentSong.getTitle()))
-                            {
-                                next = songList.get(i+1).getTitle();
-                                break;
-                            }
+                playNextSong();
+            }
+        });
+    }
+
+    public void playNextSong(){
+        MainActivity.player.stop();
+        musicOnDB.getSongs(mDatabaseRef, new MusicOnDB.songNamesCallback() {
+            @Override
+            public void onCallback(ArrayList<Song> songList) {
+                songList = songsAdapter.sortByTimestamp(songList);
+                Song next = songList.get(0);
+                for(int i = 0; i < songList.size(); i++)
+                {
+                    if(songList.get(i).getTitle().equals(MainActivity.currentSong.getTitle()))
+                    {
+                        if(songList.get(i+1) != null) {
+                            next = songList.get(i + 1);
                         }
-                        MainActivity.currentSong.setTitle(next);
-                        songsAdapter.notifyDataSetChanged();
-
-                        // Get URL from fileName
-                        musicOnDB.getFileUrl(next, new MusicOnDB.DatabaseCallback() {
-                            @Override
-                            public void onCallback(String thisURL) {
-
-                                MainActivity.player.stop();
-                                btnPlay.setBackgroundResource(R.drawable.play);
-
-                                MainActivity.player = new MediaPlayer();
-
-
-                                // Start player and setup seekbar
-                                try {
-                                    MainActivity.player.setDataSource(thisURL);
-                                    MainActivity.player.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
-                                        @Override
-                                        public void onPrepared(MediaPlayer mp) {
-                                            //adding seek bar in here
-                                            int totalTime = MainActivity.player.getDuration();
-                                            seekBar.setMax(totalTime);
-                                            //seek bar
-                                            seekBar.setOnSeekBarChangeListener(
-                                                    new SeekBar.OnSeekBarChangeListener() {
-                                                        @Override
-                                                        public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                                                            if(fromUser){
-                                                                MainActivity.player.seekTo(progress);
-                                                                seekBar.setProgress(progress);
-                                                            }
-                                                        }
-
-                                                        @Override
-                                                        public void onStartTrackingTouch(SeekBar seekBar) { }
-
-                                                        @Override
-                                                        public void onStopTrackingTouch(SeekBar seekBar) { }
-                                                    }
-                                            );
-
-                                            new Thread(new Runnable() {
-                                                @Override
-                                                public void run() {
-                                                    while(MainActivity.player != null) {
-                                                        try{
-                                                            Message msg = new Message();
-                                                            msg.what = MainActivity.player.getCurrentPosition();
-                                                            Thread.sleep(1000);
-                                                        } catch (InterruptedException e) {}
-                                                    }
-                                                }
-                                            }).start();
-                                            //end seek bar addition
-                                            MainActivity.player.start();
-                                            btnPlay.setBackgroundResource(R.drawable.stop);
-                                        }
-                                    });
-                                    MainActivity.player.prepare();
-                                } catch (IOException e) {
-                                    e.printStackTrace();
-                                }
-                            }
-                        });
+                        break;
                     }
-                });
+                }
+                MainActivity.currentSong = next;
+                songsAdapter.notifyDataSetChanged();
+
+                // Get URL from fileName
+                playFile(MainActivity.currentSong.getTitle());
             }
         });
     }
 
     public void playFile(String filename) {
-        new playFileAsync().execute(filename);
+        if(MainActivity.isHost == true) {
+            new playFileAsync().execute(filename);
+        }
     }
 
     private class playFileAsync extends AsyncTask<String, Void, Void> {
@@ -172,10 +133,14 @@ public class MusicPlayer {
                                 }
                             }
 
-                            Glide.with(context)
-                                    .load(MainActivity.currentSong.getImageURL())
-                                    .apply(new RequestOptions().placeholder(R.drawable.image))
-                                    .into(MainActivity.ivCover);
+                            if (! MainActivity.currentSong.getImageURL().equals("none")) {
+                                Glide.with(context)
+                                        .load(MainActivity.currentSong.getImageURL())
+                                        .apply(new RequestOptions().placeholder(R.drawable.image))
+                                        .into(MainActivity.ivCover);
+                            }else{
+                                MainActivity.ivCover.setImageResource(R.drawable.image);
+                            }
 
                             // Release memory from previously-playing player
                             MainActivity.player.release();
@@ -184,6 +149,10 @@ public class MusicPlayer {
                                 @Override
                                 public void onCompletion(MediaPlayer mp) {
                                     btnPlay.setBackgroundResource(R.drawable.play);
+                                    mDatabaseRef.getReference().child(MainActivity.sessionID)
+                                            .child(MainActivity.currentSong.getTitle()).removeValue();
+
+                                    playNextSong();
                                 }
                             });
                             try {
