@@ -144,6 +144,7 @@ class MusicOnDB {
                                 Calendar calendar = Calendar.getInstance();
                                 queueRef.child(songTitle).child("title").setValue(songTitle);
                                 queueRef.child(songTitle).child("artist").setValue(songArtist);
+                                queueRef.child(songTitle).child("image").setValue("none");
                                 queueRef.child(songTitle).child("timestamp").setValue(calendar.getTimeInMillis());
                                 queueRef.child(songTitle).child("vote").setValue("0");
                                 uploadProgressBar.setVisibility(View.GONE);
@@ -207,24 +208,30 @@ class MusicOnDB {
     // To get the names of the songs in the queue
     public void getSongs(FirebaseDatabase database, final songNamesCallback songsCallback) {
         database.getReference().child(MainActivity.sessionID)
-                .addListenerForSingleValueEvent(new ValueEventListener() {
+                .addValueEventListener(new ValueEventListener() {
 
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         ArrayList<Song> songNames = new ArrayList<>();
                         for (DataSnapshot songChild : dataSnapshot.getChildren()) {
-                            String title = songChild.child("title").getValue().toString();
-                            String artist = songChild.child("artist").getValue().toString();
-                            Long timestamp = Long.valueOf(songChild.child("timestamp").getValue().toString());
-                            Integer vote = Integer.valueOf(songChild.child("vote").getValue().toString());
-                            String imageURL = null;
-                            if (songChild.hasChild("image")){
-                                imageURL = songChild.child("image").getValue().toString();
+
+                            if (songChild.hasChild("title")
+                                && songChild.hasChild("artist")
+                                && songChild.hasChild("timestamp")
+                                && songChild.hasChild("vote")
+                                && songChild.hasChild("image")){
+
+                                String title = songChild.child("title").getValue().toString();
+                                String artist = songChild.child("artist").getValue().toString();
+                                Long timestamp = Long.valueOf(songChild.child("timestamp").getValue().toString());
+                                Integer vote = Integer.valueOf(songChild.child("vote").getValue().toString());
+                                String imageURL = songChild.child("image").getValue().toString();
+
+                                Song thisSong = new Song(title, artist, imageURL, timestamp, vote);
+                                songNames.add(thisSong);
+                            }else{
+                                return;
                             }
-
-                            Song thisSong = new Song(title, artist, imageURL, timestamp, vote);
-
-                            songNames.add(thisSong);
                         }
                         songsCallback.onCallback(songNames);
                     }
