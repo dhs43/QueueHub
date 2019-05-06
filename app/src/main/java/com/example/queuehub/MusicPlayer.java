@@ -133,7 +133,7 @@ public class MusicPlayer {
                                 }
                             }
 
-                            if (MainActivity.currentSong.getImageURL() != null) {
+                            if (! MainActivity.currentSong.getImageURL().equals("none")) {
                                 Glide.with(context)
                                         .load(MainActivity.currentSong.getImageURL())
                                         .apply(new RequestOptions().placeholder(R.drawable.image))

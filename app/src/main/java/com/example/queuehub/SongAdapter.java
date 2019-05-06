@@ -67,7 +67,7 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder>{
         holder.tvSongTitle.setText(song.getTitle());
         holder.tvArtist.setText(song.getArtist());
         //holder.ivCoverArt.setImageResource(R.drawable.image);
-        if (song.getImageURL() != null) {
+        if (! song.getImageURL().equals("none")) {
             Glide.with(context)
                     .load(song.getImageURL())
                     .apply(new RequestOptions().placeholder(R.drawable.image))
@@ -182,10 +182,12 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder>{
 
         if (firstJoined) {
             firstJoined = false;
-            Glide.with(context)
-                    .load(MainActivity.currentSong.getImageURL())
-                    .apply(new RequestOptions().placeholder(R.drawable.image))
-                    .into(MainActivity.ivCover);
+            if (! currentSong.getImageURL().equals("none")) {
+                Glide.with(context)
+                        .load(MainActivity.currentSong.getImageURL())
+                        .apply(new RequestOptions().placeholder(R.drawable.image))
+                        .into(MainActivity.ivCover);
+            }
         }
 
         return sorted;
