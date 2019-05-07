@@ -47,8 +47,8 @@
                 android:id="@+id/seekBar"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="30dp"
-                android:layout_marginEnd="30dp"
+                android:layout_marginStart="40dp"
+                android:layout_marginEnd="40dp"
                 android:layout_marginTop="8dp"
                 android:progressTint="@color/purp"
                 android:thumbTint="@color/strangeGray"
@@ -56,6 +56,59 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/ivCover"
                 sothree:layout_constraintHorizontal_bias="1.0" />
+
+            <TextView
+                android:id="@+id/elapsedTime"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="10dp"
+                android:layout_marginStart="40dp"
+                android:textColor="@color/offwhite"
+                android:text="0:01"
+                app:layout_constraintStart_toStartOf="parent"
+                sothree:layout_constraintEnd_toStartOf="@id/seekBar"
+                sothree:layout_constraintTop_toTopOf="@id/seekBar"
+                sothree:layout_constraintBottom_toBottomOf="@id/seekBar"/>
+
+            <TextView
+                android:id="@+id/remainingTime"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="40dp"
+                android:textColor="@color/offwhite"
+                android:text="-2:29"
+                app:layout_constraintEnd_toEndOf="parent"
+                sothree:layout_constraintStart_toEndOf="@id/seekBar"
+                sothree:layout_constraintTop_toTopOf="@id/seekBar"
+                sothree:layout_constraintBottom_toBottomOf="@id/seekBar"/>
+
+            <TextView
+                android:id="@+id/tvPlayingTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="8dp"
+                android:text="@string/playing_title"
+                android:textColor="#FFFFFF"
+                android:textSize="18sp"
+                android:maxLines="2"
+                sothree:layout_constraintStart_toStartOf="parent"
+                sothree:layout_constraintEnd_toEndOf="parent"
+                sothree:layout_constraintTop_toBottomOf="@id/seekBar" />
+
+            <TextView
+                android:id="@+id/tvPlayingArtist"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/playing_artist"
+                android:textSize="14sp"
+                android:textColor="#FFFFFF"
+                android:paddingBottom="8dp"
+                android:maxLines="1"
+                sothree:layout_constraintTop_toBottomOf="@id/tvPlayingTitle"
+                sothree:layout_constraintStart_toStartOf="parent"
+                sothree:layout_constraintEnd_toEndOf="parent" />
 
             <Button
                 android:id="@+id/btnPlay"
@@ -66,7 +119,7 @@
                 android:background="@drawable/play"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/seekBar" />
+                app:layout_constraintTop_toBottomOf="@id/tvPlayingArtist" />
 
             <Button
                 android:id="@+id/btnSkip"
@@ -79,7 +132,7 @@
                 app:layout_constraintBottom_toBottomOf="@+id/btnPlay"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@+id/btnPlay"
-                sothree:layout_constraintTop_toBottomOf="@id/seekBar" />
+                sothree:layout_constraintTop_toBottomOf="@id/tvPlayingArtist" />
 
             <Button
                 android:id="@+id/btnToggle"
@@ -91,29 +144,8 @@
                 android:background="@drawable/toggle_off"
                 app:layout_constraintEnd_toStartOf="@id/btnPlay"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/seekBar"
+                app:layout_constraintTop_toBottomOf="@id/tvPlayingArtist"
                 sothree:layout_constraintBottom_toBottomOf="@id/btnPlay" />
-
-            <TextView
-                android:id="@+id/elapsedTime"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="40dp"
-                android:textColor="@color/offwhite"
-                android:text="0:01"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/seekBar" />
-
-            <TextView
-                android:id="@+id/remainingTime"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="40dp"
-                android:textColor="@color/offwhite"
-                android:text="-2:29"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/seekBar" />
-
 
             <Button
                 android:id="@+id/btnSelectFile"
@@ -127,7 +159,6 @@
                 app:layout_constraintTop_toBottomOf="@id/btnPlay"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent" />
-
 
             <ProgressBar
                 android:id="@+id/determinateBar"

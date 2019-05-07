@@ -23,11 +23,14 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.example.queuehub.MainActivity.currentSong;
+
 public class MusicPlayer {
 
     private int totalTime;
     private SeekBar seekBar;
     private Button btnPlay;
+    private Button btnSkip;
     private Button btnToggle;
     private TextView remainingTime;
     private TextView elapsedTime;
@@ -40,11 +43,12 @@ public class MusicPlayer {
 
 
     public MusicPlayer(SeekBar mySeekBar, Button myButtonPlay, Button myButtonToggle, TextView myRemainingTime,
-                       TextView myElapsedTime, SongAdapter mySongAdapter, Button myBtnSkip,
-                        StorageReference myStorageRef, FirebaseDatabase myDatabaseRef, MusicOnDB myMusicOnDB, Context myContext) {
+                       TextView myElapsedTime, SongAdapter mySongAdapter, final Button myBtnSkip,
+                       StorageReference myStorageRef, FirebaseDatabase myDatabaseRef, MusicOnDB myMusicOnDB, Context myContext) {
         totalTime = 0;
         seekBar = mySeekBar;
         btnPlay = myButtonPlay;
+        btnSkip = myBtnSkip;
         remainingTime = myRemainingTime;
         elapsedTime = myElapsedTime;
         songsAdapter = mySongAdapter;
@@ -59,12 +63,17 @@ public class MusicPlayer {
             public void onClick(View v) {
                 if(MainActivity.isHost){
                     MainActivity.isHost = false;
+                    seekBar.setVisibility(View.GONE);
+                    elapsedTime.setVisibility(View.GONE);
+                    remainingTime.setVisibility(View.GONE);
                     btnToggle.setBackgroundResource(R.drawable.toggle_off);
                     MainActivity.player.stop();
                 }
                 else{
                     MainActivity.isHost = true;
                     seekBar.setVisibility(View.VISIBLE);
+                    elapsedTime.setVisibility(View.VISIBLE);
+                    remainingTime.setVisibility(View.VISIBLE);
                     btnToggle.setBackgroundResource(R.drawable.toggle_on);
                     // Play the first song in the queue
                     musicOnDB.getSongs(mDatabaseRef, new MusicOnDB.songNamesCallback() {
@@ -99,7 +108,7 @@ public class MusicPlayer {
             }
         });
 
-        myBtnSkip.setOnClickListener(new View.OnClickListener(){
+        btnSkip.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
                 if (MainActivity.isHost) {
@@ -181,7 +190,10 @@ public class MusicPlayer {
                         MainActivity.ivCover.setImageResource(R.drawable.image);
                     }
 
-                    if (! MainActivity.isHost) {
+                    MainActivity.tvTitle.setText(currentSong.getTitle());
+                    MainActivity.tvArtist.setText(currentSong.getArtist());
+
+                    if (!MainActivity.isHost) {
                         updateQueue(mDatabaseRef);
                         return;
                     }

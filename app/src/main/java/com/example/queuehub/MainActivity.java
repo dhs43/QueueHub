@@ -60,20 +60,20 @@ public class MainActivity extends AppCompatActivity {
 
     static Boolean isHost = false;
     static String sessionID;
-    static Boolean isSession;
     static MediaPlayer player;
     static Song currentSong = new Song("title", "artist", "url", 0L,0);
     static ArrayList<Song> songList;
     static MusicPlayer musicPlayer;
     Button btnPlay;
     static ImageView ivCover;
+    static TextView tvTitle;
+    static TextView tvArtist;
     SeekBar seekBar;
     TextView elapsedTime;
     TextView remainingTime;
     ProgressBar uploadProgressBar;
     Button btnSkip;
     Button btnToggle;
-    int totalTime;
     MusicOnDB musicOnDB;
     static Context context;
 
@@ -89,6 +89,8 @@ public class MainActivity extends AppCompatActivity {
 
         //also need to set cover art
         ivCover = findViewById(R.id.ivCover);
+        tvTitle = findViewById(R.id.tvPlayingTitle);
+        tvArtist = findViewById(R.id.tvPlayingArtist);
         seekBar = findViewById(R.id.seekBar);
         btnPlay = findViewById(R.id.btnPlay);
         btnToggle = findViewById(R.id.btnToggle);

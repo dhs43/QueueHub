@@ -36,6 +36,7 @@ import java.util.List;
 
 import static com.example.queuehub.MainActivity.currentSong;
 import static com.example.queuehub.MainActivity.isHost;
+import static com.example.queuehub.MainActivity.tvTitle;
 
 public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder>{
 
@@ -186,6 +187,8 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder>{
                         .apply(new RequestOptions().placeholder(R.drawable.image))
                         .into(MainActivity.ivCover);
             }
+            MainActivity.tvTitle.setText(currentSong.getTitle());
+            MainActivity.tvArtist.setText(currentSong.getArtist());
         }
 
         return sorted;
