@@ -7,57 +7,61 @@
     android:background="@color/black"
     tools:context="com.example.queuehub.SplashActivity">
 
+    <TextView
+        android:id="@+id/tvQHub"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/carter_one"
+        android:text="@string/title"
+        android:textColor="@color/colorAccent"
+        android:textSize="50sp"
+        android:textStyle="normal|bold|italic"
+        android:textAlignment="center"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginTop="40dp"/>
 
     <ImageView
-        android:id="@+id/imageView"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginLeft="50dp"
-        android:layout_marginRight="50dp"
-        android:layout_marginTop="120dp"
-        android:layout_marginBottom="450dp"
-        app:layout_constraintBottom_toTopOf="@+id/view2"
+        android:id="@+id/ivLogo"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
         app:layout_constraintEnd_toEndOf="parent"
+        app:srcCompat="@drawable/queue_hub"
+        app:layout_constraintBottom_toTopOf="@+id/border"
+        app:layout_constraintTop_toBottomOf="@+id/tvQHub"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView2"
-        app:srcCompat="@drawable/queue_hub" />
+        android:layout_marginBottom="15dp"/>
 
     <Button
-        android:id="@+id/btnStart"
-        android:layout_width="match_parent"
-        android:layout_height="60dp"
-        android:layout_marginLeft="120dp"
-        android:layout_marginRight="120dp"
-        android:layout_marginBottom="330dp"
-        android:layout_marginTop="270dp"
+        android:id="@+id/btnCreate"
+        android:layout_width="180dp"
+        android:layout_height="55dp"
         android:background="@drawable/rounded_button"
         android:text="@string/start_activity"
         android:textSize="15sp"
         android:textColor="@color/colorAccent"
-        app:layout_constraintBottom_toTopOf="@+id/btnJoin"
+        app:layout_constraintTop_toTopOf="@+id/border"
+        app:layout_constraintBottom_toTopOf="@+id/tvOr"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/view2" />
+        android:layout_marginTop="10dp"/>
 
     <Button
         android:id="@+id/btnJoin"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginLeft="120dp"
-        android:layout_marginTop="370dp"
-        android:layout_marginRight="120dp"
-        android:layout_marginBottom="230dp"
+        android:layout_width="180dp"
+        android:layout_height="55dp"
         android:background="@drawable/rounded_button"
         android:text="@string/join_activity"
         android:textSize="15sp"
         android:textColor="@color/colorAccent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvOr"
+        app:layout_constraintBottom_toBottomOf="@id/etLayout"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"/>
 
     <View
-        android:id="@+id/view2"
+        android:id="@+id/border"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginLeft="100dp"
@@ -72,18 +76,30 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.0" />
 
-    <android.support.design.widget.TextInputLayout
-        android:layout_width="200dp"
+    <TextView
+        android:id="@+id/tvOr"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="80dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginBottom="90dp"
-        android:textColorHint="@color/offwhite"
-        app:layout_constraintBottom_toBottomOf="@+id/view2"
+        android:layout_marginTop="2dp"
+        android:layout_marginBottom="2dp"
+        android:text="@string/separate"
+        android:textColor="@color/offwhite"
+        android:textSize="18sp"
+        android:visibility="visible"
+        app:layout_constraintBottom_toTopOf="@+id/btnJoin"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/btnJoin">
+        app:layout_constraintTop_toBottomOf="@+id/btnCreate" />
+
+    <android.support.design.widget.TextInputLayout
+        android:id="@+id/etLayout"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:textColorHint="@color/offwhite"
+        app:layout_constraintTop_toBottomOf="@+id/btnJoin"
+        app:layout_constraintBottom_toBottomOf="@+id/border"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
 
         <android.support.design.widget.TextInputEditText
             android:id="@+id/etSession"
@@ -95,35 +111,5 @@
             android:maxLength="4"
             android:textColor="@color/colorAccent" />
     </android.support.design.widget.TextInputLayout>
-
-    <TextView
-        android:id="@+id/textView2"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="130dp"
-        android:layout_marginTop="40dp"
-        android:layout_marginEnd="20dp"
-        android:fontFamily="@font/carter_one"
-        android:text="@string/title"
-        android:textColor="@color/colorAccent"
-        android:textSize="50sp"
-        android:textStyle="normal|bold|italic"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <TextView
-        android:id="@+id/textView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:layout_marginBottom="8dp"
-        android:text="@string/separate"
-        android:textColor="@color/offwhite"
-        app:layout_constraintBottom_toTopOf="@+id/btnJoin"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/btnStart" />
-
 
 </android.support.constraint.ConstraintLayout>

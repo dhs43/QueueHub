@@ -30,7 +30,7 @@ public class SplashActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
 
-        btnStart = findViewById(R.id.btnStart);
+        btnStart = findViewById(R.id.btnCreate);
         btnJoin = findViewById(R.id.btnJoin);
         etSession = findViewById(R.id.etSession);
         context = this;
