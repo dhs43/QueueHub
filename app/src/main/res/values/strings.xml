@@ -12,4 +12,5 @@
     <string name="separate">-or-</string>
     <string name="playing_title">Playing Title</string>
     <string name="playing_artist">Playing Artist</string>
+    <string name="add_to_queue">Add to Queue</string>
 </resources>
