@@ -7,7 +7,9 @@ import android.media.MediaPlayer;
 import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Message;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.SeekBar;
 import android.widget.TextView;
@@ -55,11 +57,23 @@ public class MusicPlayer {
         btnToggle.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
-                if(MainActivity.isHost == true){
+                if(MainActivity.isHost){
                     MainActivity.isHost = false;
+                    btnToggle.setBackgroundResource(R.drawable.toggle_off);
+                    MainActivity.player.stop();
                 }
                 else{
                     MainActivity.isHost = true;
+                    seekBar.setVisibility(View.VISIBLE);
+                    btnToggle.setBackgroundResource(R.drawable.toggle_on);
+                    // Play the first song in the queue
+                    musicOnDB.getSongs(mDatabaseRef, new MusicOnDB.songNamesCallback() {
+                        @Override
+                        public void onCallback(ArrayList<Song> songNames) {
+                            songNames = songsAdapter.sortByTimestamp(songNames);
+                            playFile(songNames.get(0).getTitle());
+                        }
+                    });
                 }
             }
         });
@@ -67,15 +81,18 @@ public class MusicPlayer {
         btnPlay.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (!MainActivity.player.isPlaying()) {
-                    //stopping
-                    MainActivity.player.start();
-                    seekBar.setBackgroundColor(Color.TRANSPARENT);
-                    btnPlay.setBackgroundResource(R.drawable.stop);
-                } else {
-                    //playing
-                    MainActivity.player.pause();
-                    btnPlay.setBackgroundResource(R.drawable.play);
+                if (MainActivity.isHost) {
+
+                    if (!MainActivity.player.isPlaying()) {
+                        //stopping
+                        MainActivity.player.start();
+                        seekBar.setBackgroundColor(Color.TRANSPARENT);
+                        btnPlay.setBackgroundResource(R.drawable.stop);
+                    } else {
+                        //playing
+                        MainActivity.player.pause();
+                        btnPlay.setBackgroundResource(R.drawable.play);
+                    }
                 }
             }
         });
@@ -83,7 +100,9 @@ public class MusicPlayer {
         myBtnSkip.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
-                playNextSong();
+                if (MainActivity.isHost) {
+                    playNextSong();
+                }
             }
         });
     }
@@ -114,9 +133,27 @@ public class MusicPlayer {
         });
     }
 
+    public void playCurrentSong(){
+        MainActivity.player.stop();
+        musicOnDB.getSongs(mDatabaseRef, new MusicOnDB.songNamesCallback() {
+            @Override
+            public void onCallback(ArrayList<Song> songList) {
+                songList = songsAdapter.sortByTimestamp(songList);
+
+                MainActivity.currentSong = songList.get(0);
+                songsAdapter.notifyDataSetChanged();
+
+                playFile(MainActivity.currentSong.getTitle());
+            }
+        });
+    }
+
     public void playFile(String filename) {
-        if(MainActivity.isHost == true) {
+        if(MainActivity.isHost) {
             new playFileAsync().execute(filename);
+        }else{
+            btnToggle.setBackgroundResource(R.drawable.toggle_off);
+            updateQueue(mDatabaseRef);
         }
     }
 
@@ -143,16 +180,23 @@ public class MusicPlayer {
                             }
 
                             // Release memory from previously-playing player
+                            MainActivity.player.stop();
                             MainActivity.player.release();
                             MainActivity.player = new MediaPlayer();
                             MainActivity.player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
                                 @Override
                                 public void onCompletion(MediaPlayer mp) {
                                     btnPlay.setBackgroundResource(R.drawable.play);
-                                    mDatabaseRef.getReference().child(MainActivity.sessionID)
-                                            .child(MainActivity.currentSong.getTitle()).removeValue();
 
-                                    playNextSong();
+                                    if (mDatabaseRef.getReference().child(MainActivity.sessionID)
+                                            .child(MainActivity.currentSong.getTitle()).getKey() != null){
+
+                                        if ((MainActivity.songList.size() > 1) && (MainActivity.isHost)) {
+                                            mDatabaseRef.getReference().child(MainActivity.sessionID)
+                                                    .child(MainActivity.currentSong.getTitle()).removeValue();
+                                        }
+                                    }
+                                    playCurrentSong();
                                 }
                             });
                             try {
@@ -280,7 +324,7 @@ public class MusicPlayer {
             new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    while (MainActivity.player != null) {
+                    while ((MainActivity.player != null) && (MainActivity.player.isPlaying())) {
                         try {
                             Message msg = new Message();
                             msg.what = MainActivity.player.getCurrentPosition();

@@ -121,12 +121,13 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder>{
 
 
 
-
         public void bind(final Song song, final OnItemClickListener listener){
             String title = song.getTitle();
             if(title.matches(currentSong.getTitle()))
             {
                 clSong.setBackgroundColor(Color.GRAY);
+            }else{
+                clSong.setBackgroundColor(Color.TRANSPARENT);
             }
 
             itemView.setOnClickListener(new View.OnClickListener() {
