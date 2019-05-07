@@ -149,12 +149,12 @@ public class MusicPlayer {
     }
 
     public void playFile(String filename) {
-        if(MainActivity.isHost) {
+        //if(MainActivity.isHost) {
             new playFileAsync().execute(filename);
-        }else{
-            btnToggle.setBackgroundResource(R.drawable.toggle_off);
-            updateQueue(mDatabaseRef);
-        }
+//        }else{
+//            btnToggle.setBackgroundResource(R.drawable.toggle_off);
+//            updateQueue(mDatabaseRef);
+//        }
     }
 
     private class playFileAsync extends AsyncTask<String, Void, Void> {
@@ -162,59 +162,64 @@ public class MusicPlayer {
         @Override
         protected Void doInBackground(final String... filename) {
             musicOnDB.getFileUrl(filename[0], new MusicOnDB.DatabaseCallback() {
-                        @Override
-                        public void onCallback(String fileURL) {
-                            for (Song song : MainActivity.songList) {
-                                if (song.getTitle().equals(filename[0])) {
-                                    MainActivity.currentSong = song;
-                                }
-                            }
-
-                            if (! MainActivity.currentSong.getImageURL().equals("none")) {
-                                Glide.with(context)
-                                        .load(MainActivity.currentSong.getImageURL())
-                                        .apply(new RequestOptions().placeholder(R.drawable.image))
-                                        .into(MainActivity.ivCover);
-                            }else{
-                                MainActivity.ivCover.setImageResource(R.drawable.image);
-                            }
-
-                            // Release memory from previously-playing player
-                            MainActivity.player.stop();
-                            MainActivity.player.release();
-                            MainActivity.player = new MediaPlayer();
-                            MainActivity.player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-                                @Override
-                                public void onCompletion(MediaPlayer mp) {
-                                    btnPlay.setBackgroundResource(R.drawable.play);
-
-                                    if (mDatabaseRef.getReference().child(MainActivity.sessionID)
-                                            .child(MainActivity.currentSong.getTitle()).getKey() != null){
-
-                                        if ((MainActivity.songList.size() > 1) && (MainActivity.isHost)) {
-                                            mDatabaseRef.getReference().child(MainActivity.sessionID)
-                                                    .child(MainActivity.currentSong.getTitle()).removeValue();
-                                        }
-                                    }
-                                    playCurrentSong();
-                                }
-                            });
-                            try {
-                                MainActivity.player.setDataSource(fileURL);
-                                MainActivity.player.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
-                                    @Override
-                                    public void onPrepared(MediaPlayer mp) {
-                                        setupSeekbar();
-                                    }
-                                });
-                                MainActivity.player.prepare();
-                                MainActivity.player.start();
-                                btnPlay.setBackgroundResource(R.drawable.stop);
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }
-                            updateQueue(mDatabaseRef);
+                @Override
+                public void onCallback(String fileURL) {
+                    for (Song song : MainActivity.songList) {
+                        if (song.getTitle().equals(filename[0])) {
+                            MainActivity.currentSong = song;
                         }
+                    }
+
+                    if (!MainActivity.currentSong.getImageURL().equals("none")) {
+                        Glide.with(context)
+                                .load(MainActivity.currentSong.getImageURL())
+                                .apply(new RequestOptions().placeholder(R.drawable.image))
+                                .into(MainActivity.ivCover);
+                    } else {
+                        MainActivity.ivCover.setImageResource(R.drawable.image);
+                    }
+
+                    if (! MainActivity.isHost) {
+                        updateQueue(mDatabaseRef);
+                        return;
+                    }
+
+                    // Release memory from previously-playing player
+                    MainActivity.player.stop();
+                    MainActivity.player.release();
+                    MainActivity.player = new MediaPlayer();
+                    MainActivity.player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                        @Override
+                        public void onCompletion(MediaPlayer mp) {
+                            btnPlay.setBackgroundResource(R.drawable.play);
+
+                            if (mDatabaseRef.getReference().child(MainActivity.sessionID)
+                                    .child(MainActivity.currentSong.getTitle()).getKey() != null) {
+
+                                if ((MainActivity.songList.size() > 1) && (MainActivity.isHost)) {
+                                    mDatabaseRef.getReference().child(MainActivity.sessionID)
+                                            .child(MainActivity.currentSong.getTitle()).removeValue();
+                                }
+                            }
+                            playCurrentSong();
+                        }
+                    });
+                    try {
+                        MainActivity.player.setDataSource(fileURL);
+                        MainActivity.player.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+                            @Override
+                            public void onPrepared(MediaPlayer mp) {
+                                setupSeekbar();
+                            }
+                        });
+                        MainActivity.player.prepare();
+                        MainActivity.player.start();
+                        btnPlay.setBackgroundResource(R.drawable.stop);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    updateQueue(mDatabaseRef);
+                }
             });
             return null;
         }
@@ -279,13 +284,8 @@ public class MusicPlayer {
     }
 
     private void populateQueue(ArrayList<Song> songs) {
-        ArrayList<Song> toAdd = new ArrayList<>();
-        for (int i = 0; i < songs.size(); i++) {
-            toAdd.add(songs.get(i));
-        }
-
         songsAdapter.clear();
-        songsAdapter.addSongs(toAdd);
+        songsAdapter.addSongs(songs);
     }
 
     private void setupSeekbar() {

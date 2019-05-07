@@ -245,5 +245,4 @@ class MusicOnDB {
     public interface songNamesCallback {
         void onCallback(ArrayList<Song> songNames);
     }
-
 }

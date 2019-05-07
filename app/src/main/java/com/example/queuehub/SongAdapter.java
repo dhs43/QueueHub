@@ -35,6 +35,7 @@ import java.util.Comparator;
 import java.util.List;
 
 import static com.example.queuehub.MainActivity.currentSong;
+import static com.example.queuehub.MainActivity.isHost;
 
 public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder>{
 
@@ -138,7 +139,7 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder>{
                     clSong.setBackgroundColor(Color.GRAY);
                     notifyDataSetChanged();
 
-                    Toast.makeText(context,"Now playing: " + song.getTitle(), Toast.LENGTH_LONG).show();
+                    Toast.makeText(context, "Now playing: " + song.getTitle(), Toast.LENGTH_LONG).show();
                     final String selection = song.getTitle();
                     MainActivity.musicPlayer.playFile(selection);
                 }
