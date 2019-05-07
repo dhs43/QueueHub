@@ -71,7 +71,9 @@ public class MusicPlayer {
                         @Override
                         public void onCallback(ArrayList<Song> songNames) {
                             songNames = songsAdapter.sortByTimestamp(songNames);
-                            playFile(songNames.get(0).getTitle());
+                            if(! MainActivity.player.isPlaying()) {
+                                playFile(songNames.get(0).getTitle());
+                            }
                         }
                     });
                 }
@@ -257,6 +259,8 @@ public class MusicPlayer {
 
 
     public void updateQueue (FirebaseDatabase mDatabaseRef) {
+        songsAdapter.clear();
+        songsAdapter.notifyDataSetChanged();
         new updateQueueAsync().execute(mDatabaseRef);
     }
 

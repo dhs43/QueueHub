@@ -141,7 +141,7 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder>{
 
                     Toast.makeText(context, "Now playing: " + song.getTitle(), Toast.LENGTH_LONG).show();
                     final String selection = song.getTitle();
-                    MainActivity.musicPlayer.playFile(selection);
+                    MainActivity.musicPlayer.playFile(selection); //Chad is an absolute beast
                 }
             });
         }
