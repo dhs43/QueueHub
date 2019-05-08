@@ -59,10 +59,10 @@ public class MusicPlayer {
         context = myContext;
         btnToggle = myButtonToggle;
 
-        btnToggle.setOnClickListener(new View.OnClickListener(){
+        btnToggle.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(MainActivity.isHost){
+                if (MainActivity.isHost) {
                     MainActivity.isHost = false;
                     seekBar.setVisibility(View.GONE);
                     elapsedTime.setVisibility(View.GONE);
@@ -70,8 +70,7 @@ public class MusicPlayer {
                     btnToggle.setBackgroundResource(R.drawable.rounder_button_yahdig);
                     btnToggle.setTextColor(ContextCompat.getColor(MainActivity.context, R.color.white));
                     MainActivity.player.stop();
-                }
-                else{
+                } else {
                     MainActivity.isHost = true;
                     seekBar.setVisibility(View.GONE);
                     elapsedTime.setVisibility(View.GONE);
@@ -83,7 +82,7 @@ public class MusicPlayer {
                         @Override
                         public void onCallback(ArrayList<Song> songNames) {
                             songNames = songsAdapter.sortByTimestamp(songNames);
-                            if(! MainActivity.player.isPlaying()) {
+                            if (!MainActivity.player.isPlaying()) {
                                 playFile(songNames.get(0).getTitle());
                             }
                         }
@@ -111,7 +110,7 @@ public class MusicPlayer {
             }
         });
 
-        btnSkip.setOnClickListener(new View.OnClickListener(){
+        btnSkip.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (MainActivity.isHost) {
@@ -121,24 +120,23 @@ public class MusicPlayer {
         });
     }
 
-    public void playNextSong(){
+    public void playNextSong() {
         MainActivity.player.stop();
+
+        if (mDatabaseRef.getReference().child(MainActivity.sessionID)
+                .child(MainActivity.currentSong.getTitle()).getKey() != null) {
+
+            if ((MainActivity.songList.size() > 1) && (MainActivity.isHost)) {
+                mDatabaseRef.getReference().child(MainActivity.sessionID)
+                        .child(MainActivity.currentSong.getTitle()).removeValue();
+            }
+        }
+
         musicOnDB.getSongs(mDatabaseRef, new MusicOnDB.songNamesCallback() {
             @Override
             public void onCallback(ArrayList<Song> songList) {
                 songList = songsAdapter.sortByTimestamp(songList);
-                Song next = songList.get(0);
-                for(int i = 0; i < songList.size(); i++)
-                {
-                    if(songList.get(i).getTitle().equals(MainActivity.currentSong.getTitle()))
-                    {
-                        if(songList.get(i+1) != null) {
-                            next = songList.get(i + 1);
-                        }
-                        break;
-                    }
-                }
-                MainActivity.currentSong = next;
+                MainActivity.currentSong = songList.get(0);
                 songsAdapter.notifyDataSetChanged();
 
                 // Get URL from fileName
@@ -147,7 +145,7 @@ public class MusicPlayer {
         });
     }
 
-    public void playCurrentSong(){
+    public void playCurrentSong() {
         MainActivity.player.stop();
         musicOnDB.getSongs(mDatabaseRef, new MusicOnDB.songNamesCallback() {
             @Override
@@ -163,12 +161,7 @@ public class MusicPlayer {
     }
 
     public void playFile(String filename) {
-        //if(MainActivity.isHost) {
-            new playFileAsync().execute(filename);
-//        }else{
-//            btnToggle.setBackgroundResource(R.drawable.toggle_off);
-//            updateQueue(mDatabaseRef);
-//        }
+        new playFileAsync().execute(filename);
     }
 
     private class playFileAsync extends AsyncTask<String, Void, Void> {
@@ -244,9 +237,9 @@ public class MusicPlayer {
 
     //seek bar helper functions
     @SuppressLint("HandlerLeak")
-    private Handler handler = new Handler(){
+    private Handler handler = new Handler() {
         @Override
-        public void handleMessage(Message msg){
+        public void handleMessage(Message msg) {
 
             int currentPosition = msg.what;
             seekBar.setProgress(currentPosition);
@@ -259,13 +252,13 @@ public class MusicPlayer {
         }
     };
 
-    public String createTimeLabel(int time){
+    public String createTimeLabel(int time) {
         String timeLabel = "";
         int min = time / 1000 / 60;
         int sec = time / 1000 % 60;
 
         timeLabel = min + ":";
-        if(sec < 10) timeLabel += "0";
+        if (sec < 10) timeLabel += "0";
         timeLabel += sec;
 
         return timeLabel;
@@ -273,7 +266,7 @@ public class MusicPlayer {
     //end seek bar helper functions
 
 
-    public void updateQueue (FirebaseDatabase mDatabaseRef) {
+    public void updateQueue(FirebaseDatabase mDatabaseRef) {
         songsAdapter.clear();
         songsAdapter.notifyDataSetChanged();
         new updateQueueAsync().execute(mDatabaseRef);
@@ -288,7 +281,7 @@ public class MusicPlayer {
             musicOnDB.getSongs(mDatabaseRef, new MusicOnDB.songNamesCallback() {
                 @Override
                 public void onCallback(ArrayList<Song> songNames) {
-                    for(Song thisSong : songNames){
+                    for (Song thisSong : songNames) {
                         Song tempSong = new Song(thisSong.getTitle(), thisSong.getArtist(),
                                 thisSong.getImageURL(), thisSong.getTimestamp(), thisSong.getVote());
                         songList.add(tempSong);
@@ -303,8 +296,10 @@ public class MusicPlayer {
     }
 
     private void populateQueue(ArrayList<Song> songs) {
+        ArrayList<Song> tempSongsList = songsAdapter.sortByTimestamp(songs);
+        tempSongsList.remove(0);
         songsAdapter.clear();
-        songsAdapter.addSongs(songs);
+        songsAdapter.addSongs(tempSongsList);
     }
 
     private void setupSeekbar() {
