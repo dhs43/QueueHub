@@ -68,7 +68,7 @@ public class MusicPlayer {
                     elapsedTime.setVisibility(View.GONE);
                     remainingTime.setVisibility(View.GONE);
                     btnToggle.setBackgroundResource(R.drawable.rounder_button_yahdig);
-                    btnToggle.setTextColor(ContextCompat.getColor(MainActivity.context, R.color.white));
+                    btnToggle.setTextColor(ContextCompat.getColor(MainActivity.context, R.color.colorAccent));
                     MainActivity.player.stop();
                 } else {
                     MainActivity.isHost = true;
@@ -126,10 +126,15 @@ public class MusicPlayer {
         if (mDatabaseRef.getReference().child(MainActivity.sessionID)
                 .child(MainActivity.currentSong.getTitle()).getKey() != null) {
 
-            if ((MainActivity.songList.size() > 1) && (MainActivity.isHost)) {
-                mDatabaseRef.getReference().child(MainActivity.sessionID)
-                        .child(MainActivity.currentSong.getTitle()).removeValue();
-            }
+            musicOnDB.getSongs(mDatabaseRef, new MusicOnDB.songNamesCallback() {
+                @Override
+                public void onCallback(ArrayList<Song> songNames) {
+                    if ((MainActivity.songList.size() > 1) && (MainActivity.isHost)) {
+                        mDatabaseRef.getReference().child(MainActivity.sessionID)
+                                .child(MainActivity.currentSong.getTitle()).removeValue();
+                    }
+                }
+            });
         }
 
         musicOnDB.getSongs(mDatabaseRef, new MusicOnDB.songNamesCallback() {
@@ -206,10 +211,15 @@ public class MusicPlayer {
                             if (mDatabaseRef.getReference().child(MainActivity.sessionID)
                                     .child(MainActivity.currentSong.getTitle()).getKey() != null) {
 
-                                if ((MainActivity.songList.size() > 1) && (MainActivity.isHost)) {
-                                    mDatabaseRef.getReference().child(MainActivity.sessionID)
-                                            .child(MainActivity.currentSong.getTitle()).removeValue();
-                                }
+                                musicOnDB.getSongs(mDatabaseRef, new MusicOnDB.songNamesCallback() {
+                                    @Override
+                                    public void onCallback(ArrayList<Song> songNames) {
+                                        if ((MainActivity.songList.size() > 1) && (MainActivity.isHost)) {
+                                            mDatabaseRef.getReference().child(MainActivity.sessionID)
+                                                    .child(MainActivity.currentSong.getTitle()).removeValue();
+                                        }
+                                    }
+                                });
                             }
                             playCurrentSong();
                         }
@@ -284,6 +294,7 @@ public class MusicPlayer {
                     for (Song thisSong : songNames) {
                         Song tempSong = new Song(thisSong.getTitle(), thisSong.getArtist(),
                                 thisSong.getImageURL(), thisSong.getTimestamp(), thisSong.getVote());
+
                         songList.add(tempSong);
 
                     }
@@ -296,10 +307,13 @@ public class MusicPlayer {
     }
 
     private void populateQueue(ArrayList<Song> songs) {
-        ArrayList<Song> tempSongsList = songsAdapter.sortByTimestamp(songs);
-        tempSongsList.remove(0);
         songsAdapter.clear();
-        songsAdapter.addSongs(tempSongsList);
+
+        if(songs.size() > 1) {
+            ArrayList<Song> tempSongsList = songsAdapter.sortByTimestamp(songs);
+            tempSongsList.remove(0);
+            songsAdapter.addSongs(tempSongsList);
+        }
     }
 
     private void setupSeekbar() {
