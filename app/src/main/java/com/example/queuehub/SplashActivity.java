@@ -69,6 +69,7 @@ public class SplashActivity extends AppCompatActivity {
                 
                 if(sessionID.length() < 4)
                 {
+                    mySpinner.setVisibility(View.GONE);
                     Toast.makeText(SplashActivity.this, "Invalid Session ID", Toast.LENGTH_SHORT).show();
                     return;
                 }
