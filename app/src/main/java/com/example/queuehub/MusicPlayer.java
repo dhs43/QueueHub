@@ -7,6 +7,7 @@ import android.media.MediaPlayer;
 import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Message;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.WindowManager;
@@ -66,15 +67,17 @@ public class MusicPlayer {
                     seekBar.setVisibility(View.GONE);
                     elapsedTime.setVisibility(View.GONE);
                     remainingTime.setVisibility(View.GONE);
-                    btnToggle.setBackgroundResource(R.drawable.toggle_off);
+                    btnToggle.setBackgroundResource(R.drawable.rounder_button_yahdig);
+                    btnToggle.setTextColor(ContextCompat.getColor(MainActivity.context, R.color.white));
                     MainActivity.player.stop();
                 }
                 else{
                     MainActivity.isHost = true;
-                    seekBar.setVisibility(View.VISIBLE);
-                    elapsedTime.setVisibility(View.VISIBLE);
-                    remainingTime.setVisibility(View.VISIBLE);
-                    btnToggle.setBackgroundResource(R.drawable.toggle_on);
+                    seekBar.setVisibility(View.GONE);
+                    elapsedTime.setVisibility(View.GONE);
+                    remainingTime.setVisibility(View.GONE);
+                    btnToggle.setBackgroundResource(R.drawable.rounder2);
+                    btnToggle.setTextColor(ContextCompat.getColor(MainActivity.context, R.color.purp));
                     // Play the first song in the queue
                     musicOnDB.getSongs(mDatabaseRef, new MusicOnDB.songNamesCallback() {
                         @Override

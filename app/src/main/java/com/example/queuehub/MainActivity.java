@@ -60,6 +60,7 @@ public class MainActivity extends AppCompatActivity {
 
     static Boolean isHost = false;
     static String sessionID;
+    static Boolean isCreator = false;
     static MediaPlayer player;
     static Song currentSong = new Song("title", "artist", "url", 0L,0);
     static ArrayList<Song> songList;
@@ -101,6 +102,19 @@ public class MainActivity extends AppCompatActivity {
         player = new MediaPlayer();
         songList = new ArrayList<>();
         context = this;
+
+        if(isCreator)
+        {
+            btnToggle.setVisibility(View.GONE);
+        }
+        else
+        {
+            btnPlay.setVisibility(View.GONE);
+            btnSkip.setVisibility(View.GONE);
+            seekBar.setVisibility(View.GONE);
+            remainingTime.setVisibility(View.GONE);
+            elapsedTime.setVisibility(View.GONE);
+        }
 
         //for the queue
         ArrayList<Song> songsQueue = new ArrayList<>();

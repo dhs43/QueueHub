@@ -118,6 +118,7 @@
                 android:layout_height="41dp"
                 android:layout_marginTop="8dp"
                 android:layout_marginBottom="8dp"
+                android:layout_marginRight="60dp"
                 android:background="@drawable/play"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -125,10 +126,10 @@
 
             <Button
                 android:id="@+id/btnSkip"
-                android:layout_width="35dp"
-                android:layout_height="30dp"
-                android:layout_marginStart="15dp"
-                android:layout_marginEnd="100dp"
+                android:layout_width="45dp"
+                android:layout_height="35dp"
+                android:layout_marginStart="0dp"
+                android:layout_marginEnd="120dp"
                 android:layout_marginTop="8dp"
                 android:background="@drawable/skip"
                 app:layout_constraintBottom_toBottomOf="@+id/btnPlay"
@@ -138,16 +139,17 @@
 
             <Button
                 android:id="@+id/btnToggle"
-                android:layout_width="35dp"
+                android:layout_width="150dp"
                 android:layout_height="35dp"
                 android:layout_marginTop="8dp"
-                android:layout_marginStart="100dp"
+                android:layout_marginStart="117dp"
                 android:layout_marginEnd="28dp"
-                android:background="@drawable/toggle_off"
-                app:layout_constraintEnd_toStartOf="@id/btnPlay"
+                android:background="@drawable/rounder_button_yahdig"
+                android:text="Tune In"
+                android:textAllCaps="false"
+                android:textColor="#FFF"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/tvPlayingArtist"
-                sothree:layout_constraintBottom_toBottomOf="@id/btnPlay" />
+                app:layout_constraintTop_toBottomOf="@id/tvPlayingArtist"/>
 
             <Button
                 android:id="@+id/btnSelectFile"

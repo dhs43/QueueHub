@@ -97,6 +97,7 @@ public class Session extends AppCompatActivity {
                 createSessionCallback.onCallback(ID);
                 //isHost = T
                 MainActivity.isHost = true;
+                MainActivity.isCreator = true;
             }
         });
     }

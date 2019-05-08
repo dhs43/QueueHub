@@ -58,13 +58,20 @@ public class SplashActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 String sessionID = etSession.getText().toString();
-
+                
+                if(sessionID.length() < 4)
+                {
+                    Toast.makeText(SplashActivity.this, "Invalid Session ID", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                
                 Session mySession = new Session(mDatabaseRef);
                 mySession.sessionExists(sessionID, new Session.sessionExistsCallback() {
                     @Override
                     public void onCallback(Boolean myBool, String ID) {
                         if(myBool)
                         {
+                            MainActivity.isCreator = false;
                             MainActivity.sessionID = ID;
                             Intent i = new Intent(context, MainActivity.class);
                             startActivity(i);
