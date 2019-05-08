@@ -293,8 +293,10 @@ public class MusicPlayer {
     }
 
     private void populateQueue(ArrayList<Song> songs) {
+        ArrayList<Song> tempSongsList = songsAdapter.sortByTimestamp(songs);
+        tempSongsList.remove(0);
         songsAdapter.clear();
-        songsAdapter.addSongs(songs);
+        songsAdapter.addSongs(tempSongsList);
     }
 
     private void setupSeekbar() {
