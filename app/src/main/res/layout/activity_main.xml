@@ -91,6 +91,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
                 android:layout_marginEnd="8dp"
+                android:layout_marginTop="8dp"
                 android:text="@string/playing_title"
                 android:textColor="#FFFFFF"
                 android:textSize="18sp"
@@ -142,13 +143,12 @@
                 android:layout_width="150dp"
                 android:layout_height="35dp"
                 android:layout_marginTop="8dp"
-                android:layout_marginStart="117dp"
-                android:layout_marginEnd="28dp"
                 android:background="@drawable/rounder_button_yahdig"
                 android:text="Tune In"
                 android:textAllCaps="false"
                 android:textColor="#FFF"
                 app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/tvPlayingArtist"/>
 
             <Button
