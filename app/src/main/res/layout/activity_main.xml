@@ -31,6 +31,18 @@
             app:layout_constraintTop_toTopOf="parent"
             tools:context=".MainActivity">
 
+            <TextView
+                android:id="@+id/sesh"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text=""
+                android:layout_marginRight="120dp"
+                android:layout_marginLeft="120dp"
+                android:textAlignment="center"
+                android:textColor="@color/colorAccent"
+                sothree:layout_constraintTop_toTopOf="parent"
+                sothree:layout_constraintBottom_toTopOf="@+id/ivCover"/>
+
             <ImageView
                 android:id="@+id/ivCover"
                 android:layout_width="match_parent"
@@ -90,7 +102,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
-                android:layout_marginEnd="8dp"
+                android:layout_marginEnd="6dp"
                 android:layout_marginTop="8dp"
                 android:text="@string/playing_title"
                 android:textColor="#FFFFFF"
@@ -115,8 +127,8 @@
 
             <Button
                 android:id="@+id/btnPlay"
-                android:layout_width="50dp"
-                android:layout_height="41dp"
+                android:layout_width="44dp"
+                android:layout_height="35dp"
                 android:layout_marginTop="8dp"
                 android:layout_marginBottom="8dp"
                 android:layout_marginRight="60dp"
@@ -127,8 +139,8 @@
 
             <Button
                 android:id="@+id/btnSkip"
-                android:layout_width="45dp"
-                android:layout_height="35dp"
+                android:layout_width="40dp"
+                android:layout_height="32dp"
                 android:layout_marginStart="0dp"
                 android:layout_marginEnd="120dp"
                 android:layout_marginTop="8dp"
@@ -142,7 +154,7 @@
                 android:id="@+id/btnToggle"
                 android:layout_width="150dp"
                 android:layout_height="35dp"
-                android:layout_marginTop="8dp"
+                android:layout_marginTop="6dp"
                 android:background="@drawable/rounder_button_yahdig"
                 android:text="Tune In"
                 android:textAllCaps="false"

@@ -77,6 +77,7 @@ public class MainActivity extends AppCompatActivity {
     Button btnToggle;
     MusicOnDB musicOnDB;
     static Context context;
+    TextView sesh;
 
     //for the queue
     SongAdapter songsAdapter;
@@ -102,6 +103,9 @@ public class MainActivity extends AppCompatActivity {
         player = new MediaPlayer();
         songList = new ArrayList<>();
         context = this;
+        sesh = findViewById(R.id.sesh);
+
+        sesh.setText("Sessions: " + sessionID);
 
         if(isCreator)
         {

@@ -126,18 +126,18 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder>{
         public void bind(final Song song, final OnItemClickListener listener){
             String title = song.getTitle();
 
-            itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-
-                    currentSong = song;
-                    notifyDataSetChanged();
-
-                    Toast.makeText(context, "Now playing: " + song.getTitle(), Toast.LENGTH_LONG).show();
-                    final String selection = song.getTitle();
-                    MainActivity.musicPlayer.playFile(selection); //Chad is an absolute beast
-                }
-            });
+//            itemView.setOnClickListener(new View.OnClickListener() {
+//                @Override
+//                public void onClick(View v) {
+//
+//                    currentSong = song;
+//                    notifyDataSetChanged();
+//
+//                    Toast.makeText(context, "Now playing: " + song.getTitle(), Toast.LENGTH_LONG).show();
+//                    final String selection = song.getTitle();
+//                    MainActivity.musicPlayer.playFile(selection); //Chad is an absolute beast
+//                }
+//            });
         }
     }
 

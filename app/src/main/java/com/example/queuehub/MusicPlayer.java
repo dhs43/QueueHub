@@ -68,13 +68,13 @@ public class MusicPlayer {
                     elapsedTime.setVisibility(View.GONE);
                     remainingTime.setVisibility(View.GONE);
                     btnToggle.setBackgroundResource(R.drawable.rounder_button_yahdig);
-                    btnToggle.setTextColor(ContextCompat.getColor(MainActivity.context, R.color.white));
+                    btnToggle.setTextColor(ContextCompat.getColor(MainActivity.context, R.color.colorAccent));
                     MainActivity.player.stop();
                 } else {
                     MainActivity.isHost = true;
                     seekBar.setVisibility(View.GONE);
                     elapsedTime.setVisibility(View.GONE);
-                    remainingTime.setVisibility(View.GONE);
+                    remainingTime.setVisibility(View.GONE );
                     btnToggle.setBackgroundResource(R.drawable.rounder2);
                     btnToggle.setTextColor(ContextCompat.getColor(MainActivity.context, R.color.purp));
                     // Play the first song in the queue
