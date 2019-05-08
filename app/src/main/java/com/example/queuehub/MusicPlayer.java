@@ -352,7 +352,7 @@ public class MusicPlayer {
             new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    while ((MainActivity.player != null) && (MainActivity.player.isPlaying())) {
+                    while ((MainActivity.player != null) && (MainActivity.player.isPlaying()) && (MainActivity.isCreator)) {
                         try {
                             Message msg = new Message();
                             msg.what = MainActivity.player.getCurrentPosition();
