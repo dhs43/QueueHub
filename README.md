@@ -1,6 +1,4 @@
-# ListHub
-Android app for interactive music queues
+# QueueHub 
+QueueHub is an Android app for interactive music queues.
 
-Currently the user can select an audio file to play. After selection, the file will be uploaded. Once complete, the file will be downloaded to all devices including the uploaders and the song will autoplay.
-
-clone --single-branch --branch chad https://github.com/dhs43/QueueHub
+Users can choose to create a session or join an existing one. They can add local music files to the queue. By default, only the user that created the queue will play music from their device. A user that joins can also choose to "Tune In" and play the music from their device as well. This is ideal when users are contributing to the same queue, but are not in the same physical location to listen together.
