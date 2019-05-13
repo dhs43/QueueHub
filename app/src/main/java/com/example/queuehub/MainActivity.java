@@ -58,7 +58,7 @@ public class MainActivity extends AppCompatActivity {
     // Reference to Firebase Storage
     private StorageReference mStorageRef;
 
-    static Boolean isHost = false;
+    static Boolean isTunedIn = false;
     static String sessionID;
     static Boolean isCreator = false;
     static MediaPlayer player;
@@ -105,7 +105,7 @@ public class MainActivity extends AppCompatActivity {
         context = this;
         sesh = findViewById(R.id.sesh);
 
-        sesh.setText("Sessions: " + sessionID);
+        sesh.setText("Session: " + sessionID);
 
         if(isCreator)
         {
@@ -167,7 +167,7 @@ public class MainActivity extends AppCompatActivity {
             public void onCallback(ArrayList<Song> songNames) {
                 if (songNames.size() > 0) {
                     songNames = songsAdapter.sortByTimestamp(songNames);
-                    if (MainActivity.player.isPlaying()) { return; }
+                    if (MainActivity.player.isPlaying() && (MainActivity.isCreator)) { return; }
                     musicPlayer.playFile(songNames.get(0).getTitle());
                 }else{
                     return;

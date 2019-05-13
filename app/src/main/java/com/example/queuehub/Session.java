@@ -1,19 +1,13 @@
 package com.example.queuehub;
 
-import android.content.Context;
-import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.view.WindowManager;
-import android.widget.Toast;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-
-import java.util.ArrayList;
 
 public class Session extends AppCompatActivity {
 
@@ -65,12 +59,10 @@ public class Session extends AppCompatActivity {
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                         if(dataSnapshot.hasChild(stringID))
                         {
-                            //MainActivity.isAHost = true;
                             sessionExistsCallaback.onCallback(true, stringID);
                         }
                         else
                         {
-                            //MainActivity.isAHost = false;
                             sessionExistsCallaback.onCallback(false, stringID);
                         }
                     }
@@ -95,8 +87,6 @@ public class Session extends AppCompatActivity {
             public void onCallback(String ID) {
                 //set code to sessionID
                 createSessionCallback.onCallback(ID);
-                //isHost = T
-                MainActivity.isHost = true;
                 MainActivity.isCreator = true;
             }
         });

@@ -8,9 +8,8 @@ import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
-import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.SeekBar;
 import android.widget.TextView;
@@ -22,9 +21,9 @@ import com.google.firebase.storage.StorageReference;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
 
 import static com.example.queuehub.MainActivity.currentSong;
+import static com.example.queuehub.MainActivity.musicPlayer;
 
 public class MusicPlayer {
 
@@ -62,8 +61,8 @@ public class MusicPlayer {
         btnToggle.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (MainActivity.isHost) {
-                    MainActivity.isHost = false;
+                if (MainActivity.isTunedIn) {
+                    MainActivity.isTunedIn = false;
                     seekBar.setVisibility(View.GONE);
                     elapsedTime.setVisibility(View.GONE);
                     remainingTime.setVisibility(View.GONE);
@@ -71,7 +70,7 @@ public class MusicPlayer {
                     btnToggle.setTextColor(ContextCompat.getColor(MainActivity.context, R.color.colorAccent));
                     MainActivity.player.stop();
                 } else {
-                    MainActivity.isHost = true;
+                    MainActivity.isTunedIn = true;
                     seekBar.setVisibility(View.GONE);
                     elapsedTime.setVisibility(View.GONE);
                     remainingTime.setVisibility(View.GONE );
@@ -94,17 +93,15 @@ public class MusicPlayer {
         btnPlay.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (MainActivity.isHost) {
+                if (MainActivity.isCreator) {
 
-                    if (!MainActivity.player.isPlaying()) {
-                        //stopping
+                    if (MainActivity.player.isPlaying()) {
+                        MainActivity.player.pause();
+                        btnPlay.setBackgroundResource(R.drawable.play);
+                    } else {
                         MainActivity.player.start();
                         seekBar.setBackgroundColor(Color.TRANSPARENT);
                         btnPlay.setBackgroundResource(R.drawable.stop);
-                    } else {
-                        //playing
-                        MainActivity.player.pause();
-                        btnPlay.setBackgroundResource(R.drawable.play);
                     }
                 }
             }
@@ -113,7 +110,7 @@ public class MusicPlayer {
         btnSkip.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (MainActivity.isHost) {
+                if (MainActivity.isCreator) {
                     playNextSong();
                 }
             }
@@ -122,14 +119,16 @@ public class MusicPlayer {
 
     public void playNextSong() {
         MainActivity.player.stop();
+        final Song thisCurrentSong = currentSong;
 
+        // Remove first song if there are at least two songs in queue
         if (mDatabaseRef.getReference().child(MainActivity.sessionID)
                 .child(MainActivity.currentSong.getTitle()).getKey() != null) {
 
             musicOnDB.getSongs(mDatabaseRef, new MusicOnDB.songNamesCallback() {
                 @Override
                 public void onCallback(ArrayList<Song> songNames) {
-                    if ((MainActivity.songList.size() > 1) && (MainActivity.isHost)) {
+                    if ((songNames.size() > 1) && (MainActivity.isCreator) && (currentSong == thisCurrentSong)) {
                         mDatabaseRef.getReference().child(MainActivity.sessionID)
                                 .child(MainActivity.currentSong.getTitle()).removeValue();
                     }
@@ -137,15 +136,17 @@ public class MusicPlayer {
             });
         }
 
+        // Play first song in queue
         musicOnDB.getSongs(mDatabaseRef, new MusicOnDB.songNamesCallback() {
             @Override
             public void onCallback(ArrayList<Song> songList) {
-                songList = songsAdapter.sortByTimestamp(songList);
-                MainActivity.currentSong = songList.get(0);
-                songsAdapter.notifyDataSetChanged();
+                    songList = songsAdapter.sortByTimestamp(songList);
+                    MainActivity.currentSong = songList.get(0);
+                    songsAdapter.notifyDataSetChanged();
 
-                // Get URL from fileName
-                playFile(MainActivity.currentSong.getTitle());
+                    // Get URL from fileName
+                    playFile(MainActivity.currentSong.getTitle());
+                    populateQueue(songList);
             }
         });
     }
@@ -194,7 +195,7 @@ public class MusicPlayer {
                     MainActivity.tvTitle.setText(currentSong.getTitle());
                     MainActivity.tvArtist.setText(currentSong.getArtist());
 
-                    if (!MainActivity.isHost) {
+                    if (! MainActivity.isTunedIn) {
                         updateQueue(mDatabaseRef);
                         return;
                     }
@@ -208,20 +209,11 @@ public class MusicPlayer {
                         public void onCompletion(MediaPlayer mp) {
                             btnPlay.setBackgroundResource(R.drawable.play);
 
-                            if (mDatabaseRef.getReference().child(MainActivity.sessionID)
-                                    .child(MainActivity.currentSong.getTitle()).getKey() != null) {
-
-                                musicOnDB.getSongs(mDatabaseRef, new MusicOnDB.songNamesCallback() {
-                                    @Override
-                                    public void onCallback(ArrayList<Song> songNames) {
-                                        if ((MainActivity.songList.size() > 1) && (MainActivity.isHost)) {
-                                            mDatabaseRef.getReference().child(MainActivity.sessionID)
-                                                    .child(MainActivity.currentSong.getTitle()).removeValue();
-                                        }
-                                    }
-                                });
+                            if (MainActivity.isCreator){
+                                playNextSong();
+                            }else {
+                                playCurrentSong();
                             }
-                            playCurrentSong();
                         }
                     });
                     try {
@@ -291,12 +283,12 @@ public class MusicPlayer {
             musicOnDB.getSongs(mDatabaseRef, new MusicOnDB.songNamesCallback() {
                 @Override
                 public void onCallback(ArrayList<Song> songNames) {
+                    songList.clear();
                     for (Song thisSong : songNames) {
                         Song tempSong = new Song(thisSong.getTitle(), thisSong.getArtist(),
                                 thisSong.getImageURL(), thisSong.getTimestamp(), thisSong.getVote());
 
                         songList.add(tempSong);
-
                     }
                     populateQueue(songList);
                 }
@@ -306,7 +298,7 @@ public class MusicPlayer {
         }
     }
 
-    private void populateQueue(ArrayList<Song> songs) {
+    public void populateQueue(ArrayList<Song> songs) {
         songsAdapter.clear();
 
         if(songs.size() > 1) {
@@ -314,6 +306,7 @@ public class MusicPlayer {
             tempSongsList.remove(0);
             songsAdapter.addSongs(tempSongsList);
         }
+        songsAdapter.notifyDataSetChanged();
     }
 
     private void setupSeekbar() {
@@ -352,13 +345,14 @@ public class MusicPlayer {
             new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    while ((MainActivity.player != null) && (MainActivity.player.isPlaying()) && (MainActivity.isCreator)) {
+                    while ((MainActivity.player != null) && (MainActivity.isCreator)) {
                         try {
                             Message msg = new Message();
                             msg.what = MainActivity.player.getCurrentPosition();
                             handler.sendMessage(msg);
                             Thread.sleep(1000);
                         } catch (InterruptedException e) {
+                            Log.e(TAG, e.getMessage());
                         }
                     }
                 }

@@ -1,42 +1,29 @@
 package com.example.queuehub;
 
 import android.content.Context;
-import android.graphics.Color;
-import android.media.MediaPlayer;
-import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.constraint.ConstraintLayout;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.annotation.GlideModule;
-import com.bumptech.glide.module.AppGlideModule;
 import com.bumptech.glide.request.RequestOptions;
-import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
 import static com.example.queuehub.MainActivity.currentSong;
-import static com.example.queuehub.MainActivity.isHost;
-import static com.example.queuehub.MainActivity.tvTitle;
 
 public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder>{
 

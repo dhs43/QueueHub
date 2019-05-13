@@ -80,7 +80,8 @@ public class SplashActivity extends AppCompatActivity {
                     public void onCallback(Boolean myBool, String ID) {
                         if(myBool)
                         {
-                            MainActivity.isCreator = false;
+//                            MainActivity.isCreator = true; // FOR TESTING
+//                            MainActivity.isTunedIn = true;
                             MainActivity.sessionID = ID;
                             Intent i = new Intent(context, MainActivity.class);
                             mySpinner.setVisibility(View.GONE);
