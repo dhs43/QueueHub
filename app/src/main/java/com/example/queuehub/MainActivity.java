@@ -58,7 +58,7 @@ public class MainActivity extends AppCompatActivity {
     // Reference to Firebase Storage
     private StorageReference mStorageRef;
 
-    static Boolean isTunedIn = false;
+    //static Boolean isTunedIn = false;
     static String sessionID;
     static Boolean isCreator = false;
     static MediaPlayer player;
@@ -95,7 +95,7 @@ public class MainActivity extends AppCompatActivity {
         tvArtist = findViewById(R.id.tvPlayingArtist);
         seekBar = findViewById(R.id.seekBar);
         btnPlay = findViewById(R.id.btnPlay);
-        btnToggle = findViewById(R.id.btnToggle);
+        //btnToggle = findViewById(R.id.btnToggle);
         elapsedTime = findViewById(R.id.elapsedTime);
         remainingTime = findViewById(R.id.remainingTime);
         btnSkip = findViewById(R.id.btnSkip);
@@ -109,7 +109,7 @@ public class MainActivity extends AppCompatActivity {
 
         if(isCreator)
         {
-            btnToggle.setVisibility(View.GONE);
+            //btnToggle.setVisibility(View.GONE);
         }
         else
         {

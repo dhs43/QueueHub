@@ -23,7 +23,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import static com.example.queuehub.MainActivity.currentSong;
+import static com.example.queuehub.MainActivity.isCreator;
 import static com.example.queuehub.MainActivity.musicPlayer;
+import static com.example.queuehub.MainActivity.songList;
 
 public class MusicPlayer {
 
@@ -40,6 +42,7 @@ public class MusicPlayer {
     private MusicOnDB musicOnDB;
     final private String TAG = "MusicPlayer";
     private Context context;
+    private Song nowPlaying;
 
 
     public MusicPlayer(SeekBar mySeekBar, Button myButtonPlay, Button myButtonToggle, TextView myRemainingTime,
@@ -58,37 +61,37 @@ public class MusicPlayer {
         context = myContext;
         btnToggle = myButtonToggle;
 
-        btnToggle.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (MainActivity.isTunedIn) {
-                    MainActivity.isTunedIn = false;
-                    seekBar.setVisibility(View.GONE);
-                    elapsedTime.setVisibility(View.GONE);
-                    remainingTime.setVisibility(View.GONE);
-                    btnToggle.setBackgroundResource(R.drawable.rounder_button_yahdig);
-                    btnToggle.setTextColor(ContextCompat.getColor(MainActivity.context, R.color.colorAccent));
-                    MainActivity.player.stop();
-                } else {
-                    MainActivity.isTunedIn = true;
-                    seekBar.setVisibility(View.GONE);
-                    elapsedTime.setVisibility(View.GONE);
-                    remainingTime.setVisibility(View.GONE );
-                    btnToggle.setBackgroundResource(R.drawable.rounder2);
-                    btnToggle.setTextColor(ContextCompat.getColor(MainActivity.context, R.color.purp));
-                    // Play the first song in the queue
-                    musicOnDB.getSongs(mDatabaseRef, new MusicOnDB.songNamesCallback() {
-                        @Override
-                        public void onCallback(ArrayList<Song> songNames) {
-                            songNames = songsAdapter.sortByTimestamp(songNames);
-                            if (!MainActivity.player.isPlaying()) {
-                                playFile(songNames.get(0).getTitle());
-                            }
-                        }
-                    });
-                }
-            }
-        });
+//        btnToggle.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                if (MainActivity.isTunedIn) {
+//                    MainActivity.isTunedIn = false;
+//                    seekBar.setVisibility(View.GONE);
+//                    elapsedTime.setVisibility(View.GONE);
+//                    remainingTime.setVisibility(View.GONE);
+//                    btnToggle.setBackgroundResource(R.drawable.rounder_button_yahdig);
+//                    btnToggle.setTextColor(ContextCompat.getColor(MainActivity.context, R.color.colorAccent));
+//                    MainActivity.player.pause();
+//                } else {
+//                    MainActivity.isTunedIn = true;
+//                    seekBar.setVisibility(View.GONE);
+//                    elapsedTime.setVisibility(View.GONE);
+//                    remainingTime.setVisibility(View.GONE );
+//                    btnToggle.setBackgroundResource(R.drawable.rounder2);
+//                    btnToggle.setTextColor(ContextCompat.getColor(MainActivity.context, R.color.purp));
+//                    // Play the first song in the queue
+//                    musicOnDB.getSongs(mDatabaseRef, new MusicOnDB.songNamesCallback() {
+//                        @Override
+//                        public void onCallback(ArrayList<Song> songNames) {
+//                            songNames = songsAdapter.sortByTimestamp(songNames);
+//                            if (! MainActivity.player.isPlaying()) {
+//                                playFile(songNames.get(0).getTitle());
+//                            }
+//                        }
+//                    });
+//                }
+//            }
+//        });
 
         btnPlay.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -110,15 +113,13 @@ public class MusicPlayer {
         btnSkip.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (MainActivity.isCreator) {
-                    playNextSong();
-                }
+                playNextSong();
             }
         });
     }
 
     public void playNextSong() {
-        MainActivity.player.stop();
+        MainActivity.player.pause();
         final Song thisCurrentSong = currentSong;
 
         // Remove first song if there are at least two songs in queue
@@ -140,28 +141,33 @@ public class MusicPlayer {
         musicOnDB.getSongs(mDatabaseRef, new MusicOnDB.songNamesCallback() {
             @Override
             public void onCallback(ArrayList<Song> songList) {
-                    songList = songsAdapter.sortByTimestamp(songList);
-                    MainActivity.currentSong = songList.get(0);
-                    songsAdapter.notifyDataSetChanged();
+                nowPlaying = currentSong;
+                songList = songsAdapter.sortByTimestamp(songList);
+                MainActivity.currentSong = songList.get(0);
+                songsAdapter.notifyDataSetChanged();
 
-                    // Get URL from fileName
+                if (!MainActivity.player.isPlaying()) {
                     playFile(MainActivity.currentSong.getTitle());
-                    populateQueue(songList);
+                }
+                populateQueue(songList);
             }
         });
     }
 
     public void playCurrentSong() {
-        MainActivity.player.stop();
+        MainActivity.player.pause();
         musicOnDB.getSongs(mDatabaseRef, new MusicOnDB.songNamesCallback() {
             @Override
             public void onCallback(ArrayList<Song> songList) {
                 songList = songsAdapter.sortByTimestamp(songList);
 
+                nowPlaying = currentSong;
                 MainActivity.currentSong = songList.get(0);
                 songsAdapter.notifyDataSetChanged();
 
-                playFile(MainActivity.currentSong.getTitle());
+                if (! MainActivity.player.isPlaying()) {
+                    playFile(MainActivity.currentSong.getTitle());
+                }
             }
         });
     }
@@ -183,9 +189,22 @@ public class MusicPlayer {
                         }
                     }
 
-                    if (!MainActivity.currentSong.getImageURL().equals("none")) {
+                    if (! isCreator) {
+                        musicOnDB.getSongs(mDatabaseRef, new MusicOnDB.songNamesCallback() {
+                            @Override
+                            public void onCallback(ArrayList<Song> songList) {
+                                nowPlaying = currentSong;
+                                songList = songsAdapter.sortByTimestamp(songList);
+                                MainActivity.currentSong = songList.get(0);
+                                songsAdapter.notifyDataSetChanged();
+                                populateQueue(songList);
+                            }
+                        });
+                    }
+
+                    if (! currentSong.getImageURL().equals("none")) {
                         Glide.with(context)
-                                .load(MainActivity.currentSong.getImageURL())
+                                .load(currentSong.getImageURL())
                                 .apply(new RequestOptions().placeholder(R.drawable.image))
                                 .into(MainActivity.ivCover);
                     } else {
@@ -195,13 +214,13 @@ public class MusicPlayer {
                     MainActivity.tvTitle.setText(currentSong.getTitle());
                     MainActivity.tvArtist.setText(currentSong.getArtist());
 
-                    if (! MainActivity.isTunedIn) {
+                    if(! isCreator) {
                         updateQueue(mDatabaseRef);
                         return;
                     }
 
                     // Release memory from previously-playing player
-                    MainActivity.player.stop();
+                    MainActivity.player.pause();
                     MainActivity.player.release();
                     MainActivity.player = new MediaPlayer();
                     MainActivity.player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
@@ -209,11 +228,7 @@ public class MusicPlayer {
                         public void onCompletion(MediaPlayer mp) {
                             btnPlay.setBackgroundResource(R.drawable.play);
 
-                            if (MainActivity.isCreator){
-                                playNextSong();
-                            }else {
-                                playCurrentSong();
-                            }
+                            playNextSong();
                         }
                     });
                     try {
@@ -346,13 +361,36 @@ public class MusicPlayer {
                 @Override
                 public void run() {
                     while ((MainActivity.player != null) && (MainActivity.isCreator)) {
+                        int currentPosition;
                         try {
                             Message msg = new Message();
-                            msg.what = MainActivity.player.getCurrentPosition();
+                            currentPosition = MainActivity.player.getCurrentPosition();
+                            msg.what = currentPosition;
                             handler.sendMessage(msg);
                             Thread.sleep(1000);
-                        } catch (InterruptedException e) {
-                            Log.e(TAG, e.getMessage());
+                        } catch (final Exception e) {
+                            // Try to get current position 3 times before throwing exception
+                            if (e instanceof IllegalStateException) {
+                                boolean checkAgain = true;
+                                int counter = 0;
+                                for (int i = 0; i < 2; i++) {
+                                    if(checkAgain) {
+                                        if((MainActivity.player != null) && (MainActivity.player.isPlaying())) {
+                                            currentPosition = MainActivity.player.getCurrentPosition();
+                                        }else{
+                                            currentPosition = 0;
+                                        }
+                                        if (currentPosition > 0) {
+                                            checkAgain = false;
+                                            counter++;
+                                        }
+                                    }else{
+                                        if (counter == 0) {
+                                            Log.e(TAG, e.getMessage());
+                                        }
+                                    }
+                                }
+                            }
                         }
                     }
                 }

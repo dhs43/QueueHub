@@ -33,7 +33,6 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder>{
     private Button btnPlay;
     private SeekBar seekBar;
     private MusicOnDB musicOnDB;
-    private Boolean firstJoined = true;
 
     public interface  OnItemClickListener{
         void onItemClick(Song song);
@@ -159,17 +158,15 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder>{
             currentSong = sorted.get(0);
         }
 
-        if (firstJoined) {
-            firstJoined = false;
-            if (! currentSong.getImageURL().equals("none")) {
-                Glide.with(context)
-                        .load(MainActivity.currentSong.getImageURL())
-                        .apply(new RequestOptions().placeholder(R.drawable.image))
-                        .into(MainActivity.ivCover);
-            }
-            MainActivity.tvTitle.setText(currentSong.getTitle());
-            MainActivity.tvArtist.setText(currentSong.getArtist());
+
+        if (!currentSong.getImageURL().equals("none")) {
+            Glide.with(context)
+                    .load(MainActivity.currentSong.getImageURL())
+                    .apply(new RequestOptions().placeholder(R.drawable.image))
+                    .into(MainActivity.ivCover);
         }
+        MainActivity.tvTitle.setText(currentSong.getTitle());
+        MainActivity.tvArtist.setText(currentSong.getArtist());
 
         return sorted;
     }

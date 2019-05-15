@@ -150,18 +150,18 @@
                 app:layout_constraintStart_toEndOf="@+id/btnPlay"
                 sothree:layout_constraintTop_toBottomOf="@id/tvPlayingArtist" />
 
-            <Button
-                android:id="@+id/btnToggle"
-                android:layout_width="150dp"
-                android:layout_height="35dp"
-                android:layout_marginTop="6dp"
-                android:background="@drawable/rounder_button_yahdig"
-                android:text="Tune In"
-                android:textAllCaps="false"
-                android:textColor="#FFF"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/tvPlayingArtist"/>
+            <!--<Button-->
+                <!--android:id="@+id/btnToggle"-->
+                <!--android:layout_width="150dp"-->
+                <!--android:layout_height="35dp"-->
+                <!--android:layout_marginTop="6dp"-->
+                <!--android:background="@drawable/rounder_button_yahdig"-->
+                <!--android:text="Tune In"-->
+                <!--android:textAllCaps="false"-->
+                <!--android:textColor="#FFF"-->
+                <!--app:layout_constraintStart_toStartOf="parent"-->
+                <!--app:layout_constraintEnd_toEndOf="parent"-->
+                <!--app:layout_constraintTop_toBottomOf="@id/tvPlayingArtist"/>-->
 
             <Button
                 android:id="@+id/btnSelectFile"
