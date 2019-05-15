@@ -5,7 +5,7 @@ QueueHub is an Android app for interactive music queues.
 Users can choose to create a session or join an existing one. They can add local music files to the queue. By default, only the user that created the queue will play music from their device. A user that joins can also choose to "Tune In" and play the music from their device as well. This is ideal when users are contributing to the same queue, but are not in the same physical location to listen together.
 
 ### App Walkthrough GIF
-<img src="YOUR_GIF_URL_HERE" width=250><br>
+<img src="qhub.gif" width=250><br>
 
 ## Walkthrough
 If youre opening the application using an emulator you can either join or create a session but unfortunately we dont have any local mp3s in the app that you could add to the queue from; So if your emulator dosen't have any local files feel free to use the already filled session id 6709 to demonstrate that on regular phones you can add songs. 
