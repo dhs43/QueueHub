@@ -16,7 +16,7 @@ To sum up, creater sessions may add music to queue, play music, give out the ses
 
 Features:
 
-Recycler View: Presents the song queue on both the create and join session formats.\
+Recycler View: Presents the song queue on both the create and join session formats.
 
 Use of firebase to upload and stream files and metadata.
 
