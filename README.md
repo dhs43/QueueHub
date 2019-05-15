@@ -15,11 +15,16 @@ Right now users can start using this app by creating a session, those who create
 To sum up, creater sessions may add music to queue, play music, give out the session ID, and skip songs; joined sessions may view what the host is playing and add music to queue.
 
 Features:
--Recycler View: Presents the song queue on both the create and join session formats.
--Use of firebase to upload and stream files and metadata.
--Use of firebase to create sessions and join them.
--Use of mediaplayer.
--Easily traversable and understandable user interface [dark theme]
+
+Recycler View: Presents the song queue on both the create and join session formats.\
+
+Use of firebase to upload and stream files and metadata.
+
+Use of firebase to create sessions and join them.
+
+Use of mediaplayer.
+
+Easily traversable and understandable user interface [dark theme]
 
 ### Notes
 As of right now we have disabled the "Tune In" feature for the join session option because its a bit buggier than we had hoped and would like to work on it a bit further before we present it here, or more importantly the app store.
