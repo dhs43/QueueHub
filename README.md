@@ -31,4 +31,4 @@ As of right now we have disabled the "Tune In" feature for the join session opti
 
 ### Open-source libraries used 
 - [Glide](https://github.com/bumptech/glide) - Image loading and caching library for Androids
-- [Sliding Panel] (https://github.com/umano/AndroidSlidingUpPanel) - Simple way to add a draggable sliding up panel
+- [Sliding Panel](https://github.com/umano/AndroidSlidingUpPanel) - Simple way to add a draggable sliding up panel
