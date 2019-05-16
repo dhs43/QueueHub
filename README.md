@@ -1,18 +1,16 @@
-## qHub
+## QueueHub
 QueueHub is an Android app for interactive music queues.
 
 ### Description
-Users can choose to create a session or join an existing one. They can add local music files to the queue. Only the user that created the queue will play music from their device. Other users can only add to and view the queue.
+Users can choose to create a session or join an existing one. They can add local music files to the queue. Only the user that created the queue will play music from their device. Other users can add to and view the queue.
 
 ### App Walkthrough GIF
 <img src="qhub.gif" width=250><br>
 
 ## Walkthrough
-If youre opening the application using an emulator you can either join or create a session. You can add mp3 files from your device, or join the already created session 6709 to view a pre-loaded queue.
+When opening the app you can either join or create a session. You can add mp3 files from your device, or join an already-created session 6709 to view a pre-loaded queue.
 
-Right now users can start using this app by creating a session, those who create sessions are those who would have music playing on their devices. The app is meant for multiple users so another device might join said created session using the session ID provided at the top of the screen of the creator. Those who join sessions may only add to queue and view what is currently playing from the host's device.
-
-To sum up, creater sessions may add music to queue, play music, give out the session ID, and skip songs; joined sessions may view what the host is playing and add music to queue.
+Those who create sessions play the music from their device, ideally over a speaker system. The app is designed for groups, so another user might join the session using the session ID provided at the top of the creator's screen. Those who join sessions may only add to the queue and view what is currently playing from the host's device.
 
 Features:
 
